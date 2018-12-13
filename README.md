@@ -281,7 +281,7 @@ func send() -> Observable<Void> {
 - [ ] Align multiline `=` assignments
 - [ ] \(Your idea comes here 💡\)
 
-## Acknoledgement
+## Acknowledgement
 
 - [Improving Swift Tools with libSyntax](https://academy.realm.io/posts/improving-swift-tools-with-libsyntax-try-swift-haskin-2017/) by @harlanhaskins
 - [Creating Refactoring Transformations for Swift](https://www.skilled.io/u/swiftsummit/creating-refactoring-transformations-for-swift) by @nkcsgexi
