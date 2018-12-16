@@ -38,6 +38,5 @@ uninstall:
 
 .PHONY: bottle
 bottle:
-	brew tap inamiy/formulae/swift-rewriter
-	brew install swift-rewriter --verbose --build-bottle
+	brew install inamiy/formulae/swift-rewriter --verbose --build-bottle
 	brew bottle swift-rewriter
