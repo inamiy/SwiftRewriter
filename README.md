@@ -173,7 +173,7 @@ import D
 
 will be:
 
-```diff
+```swift
 import A
 import B
 import C
