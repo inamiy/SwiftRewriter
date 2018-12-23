@@ -15,7 +15,7 @@ open class TrailingSpaceTrimmer: SyntaxRewriter
         var token2 = token
 
         if isTrailingToken {
-            token2 = token.with(.trailingTrivia, replacingFirstSpaces: 0)
+            token2 = token.with(.trailingTrivia, replacingFirstSpaces: [])
         }
 
         return super.visit(token2)
