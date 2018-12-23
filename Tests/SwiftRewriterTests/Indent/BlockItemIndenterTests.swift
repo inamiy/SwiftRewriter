@@ -610,20 +610,51 @@ final class BlockItemIndenterTests: XCTestCase
             func foo(
             x: Int,
             y: Int
-            ) -> Int {}
+            ) -> Int {
+            print()
+            }
             """
 
         let expected = """
             func foo(
                 x: Int,
                 y: Int
-                ) -> Int {}
+            ) -> Int {
+                print()
+            }
             """
 
         try runTest(
             source: source,
             expected: expected,
-            using: BlockItemIndenter()
+            using: BlockItemIndenter(usesXcodeStyle: false)
+        )
+    }
+
+    func test_func_newlineReturnType2_usesXcodeStyle() throws
+    {
+        let source = """
+            func foo(
+            x: Int,
+            y: Int
+            ) -> Int {
+            print()
+            }
+            """
+
+        let expected = """
+            func foo(
+                x: Int,
+                y: Int
+                ) -> Int {
+                print()
+            }
+            """
+
+        try runTest(
+            source: source,
+            expected: expected,
+            using: BlockItemIndenter(usesXcodeStyle: true)
         )
     }
 
