@@ -18,5 +18,10 @@ final class CombinedTests: XCTestCase
             let rewriter = ExtraNewliner()
             try runTestFile("densed", using: rewriter)
         }
+
+        do {
+            let rewriter = MethodChainNewliner()
+            try runTestFile("method-chain", using: rewriter)
+        }
     }
 }

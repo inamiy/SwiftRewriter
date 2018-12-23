@@ -66,7 +66,8 @@ api.send {
     $0.run {
         $0
     }
-    }.foo()
+    }
+    .foo()
     .bar()
     .foo {
         print()

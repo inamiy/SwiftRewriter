@@ -16,6 +16,7 @@ var rewriter: Rewriter {
         // Newline
 //        >>> ExtraNewliner()   // not useful for everyone
         >>> ElseNewliner(newline: false)
+        >>> MethodChainNewliner()
 
         // Indent
         >>> Indenter(.init(
