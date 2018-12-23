@@ -105,15 +105,15 @@ extension OptionalKleisli
     private static func _handleTrailingSpacesBefore(shouldInsert: Bool) -> TokenHandler
     {
         return shouldInsert
-            ? TokenHandler { $0.with(.trailingTrivia, replacingLastSpaces: 1) }
-            : TokenHandler { $0.with(.trailingTrivia, replacingLastSpaces: 0) }
+            ? TokenHandler { $0.with(.trailingTrivia, replacingLastSpaces: [.spaces(1)]) }
+            : TokenHandler { $0.with(.trailingTrivia, replacingLastSpaces: []) }
     }
 
     /// Replace `trailingTrivia`'s first spaces.
     private static func _handleTrailingSpacesAfter(shouldInsert: Bool) -> TokenHandler
     {
         return shouldInsert
-            ? TokenHandler { $0.with(.trailingTrivia, replacingFirstSpaces: 1) }
-            : TokenHandler { $0.with(.trailingTrivia, replacingFirstSpaces: 0) }
+            ? TokenHandler { $0.with(.trailingTrivia, replacingFirstSpaces: [.spaces(1)]) }
+            : TokenHandler { $0.with(.trailingTrivia, replacingFirstSpaces: []) }
     }
 }

@@ -16,7 +16,9 @@ open class ExtraSpaceTrimmer: SyntaxRewriter
 
         if token.leadingTriviaLength.newlines == 0 && !self._skipsNextLeadingTriva
         {
-            let lastSpaces = token.leadingTrivia.pieces.last?.isSpace == true ? 1 : 0
+            let lastSpaces = token.leadingTrivia.pieces.last?.isSpace == true
+                ? [TriviaPiece.spaces(1)]
+                : []
             token2 = token2.with(.leadingTrivia, replacingLastSpaces: lastSpaces)
         }
 
@@ -27,7 +29,9 @@ open class ExtraSpaceTrimmer: SyntaxRewriter
             self._skipsNextLeadingTriva = true
         }
         else if token.trailingTriviaLength.newlines == 0 {
-            let firstSpaces = token.trailingTrivia.pieces.first?.isSpace == true ? 1 : 0
+            let firstSpaces = token.trailingTrivia.pieces.first?.isSpace == true
+                ? [TriviaPiece.spaces(1)]
+                : []
             token2 = token2.with(.trailingTrivia, replacingFirstSpaces: firstSpaces)
         }
 

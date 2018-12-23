@@ -124,7 +124,7 @@ extension TokenSyntax
     /// Replace `leadingTrivia` / `trailingTrivia`'s last spaces.
     func with(
         _ lens: Lens<TokenSyntax, [TriviaPiece]>,
-        replacingLastSpaces spaces: Int
+        replacingLastSpaces lastPieces: [TriviaPiece]
         ) -> TokenSyntax
     {
         var pieces = lens.getter(self)
@@ -139,9 +139,7 @@ extension TokenSyntax
             }
         }
 
-        if spaces > 0 {
-            pieces.append(.spaces(spaces))
-        }
+        pieces.append(contentsOf: lastPieces)
 
         var token2 = self
         token2 = lens.setter(self, pieces)
@@ -151,7 +149,7 @@ extension TokenSyntax
     /// Replace `leadingTrivia` / `trailingTrivia`'s first spaces.
     func with(
         _ lens: Lens<TokenSyntax, [TriviaPiece]>,
-        replacingFirstSpaces spaces: Int
+        replacingFirstSpaces firstPieces: [TriviaPiece]
         ) -> TokenSyntax
     {
         var pieces = lens.getter(self)
@@ -162,9 +160,7 @@ extension TokenSyntax
             pieces.removeFirst(removalCount)
         }
 
-        if spaces > 0 {
-            pieces.insert(.spaces(spaces), at: 0)
-        }
+        pieces.insert(contentsOf: firstPieces, at: 0)
 
         var token2 = self
         token2 = lens.setter(self, pieces)
