@@ -13,7 +13,7 @@ func runExamples<T>(
     ) throws
     where T: SyntaxRewriterProtocol & HasRewriterExamples
 {
-    try rewriter.rewriterExamples
+    try rewriter.rewriterAllExamples
         .sorted(by: { $0.key < $1.key || ($0.key == $1.key && $0.value < $1.value) }) // lexicographical order
         .forEach { source, expected in
             try runTest(source: source, expected: expected, using: rewriter,

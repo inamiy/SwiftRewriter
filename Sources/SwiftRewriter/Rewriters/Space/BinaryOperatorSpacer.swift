@@ -18,12 +18,6 @@ open class BinaryOperatorSpacer: SyntaxRewriter, HasRewriterExamples
 
     var rewriterExamples: [String: String]
     {
-        return _rewriterExamples
-            .merging(_rewriterExamplesNoChange, uniquingKeysWith: { $1 })
-    }
-
-    private var _rewriterExamples: [String: String]
-    {
         switch self._spacesAround {
         case true:
             return [
@@ -44,9 +38,9 @@ open class BinaryOperatorSpacer: SyntaxRewriter, HasRewriterExamples
         }
     }
 
-    private var _rewriterExamplesNoChange: [String: String]
+    var rewriterNoChangeExamples: [String]
     {
-        let noChanges = [
+        return [
             "reduce(+)", "reduce(+ )", "reduce( +)", "reduce( + )",
             "User.table[*]", "User.table[* ]", "User.table[ *]", "User.table[ * ]", // e.g. SQLite.swift
 
@@ -58,9 +52,7 @@ open class BinaryOperatorSpacer: SyntaxRewriter, HasRewriterExamples
             // UnknownDeclSyntax bug in SwiftSyntax
             "@available(*, deprecated, message: \"...\")",
             "@available( * , deprecated, message: \"...\")"
-            ]
-
-        return [String: String](noChanges.map { ($0, $0) }, uniquingKeysWith: { $1 })
+        ]
     }
 
     public init(spacesAround: Bool = true)
