@@ -42,4 +42,7 @@ var rewriter: Rewriter {
         >>> LeftBraceSpacer(spaceBefore: true)
         >>> LeftParenSpacer(spaceBefore: true)
         >>> TrailingSpaceTrimmer()
+
+        // Token
+        >>> DecimalLiteralUnderscorer()
 }
