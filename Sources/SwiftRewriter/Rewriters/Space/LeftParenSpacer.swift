@@ -13,12 +13,6 @@ open class LeftParenSpacer: SyntaxRewriter, HasRewriterExamples
 
     var rewriterExamples: [String: String]
     {
-        return _rewriterExamples
-            .merging(_rewriterExamplesNoChange, uniquingKeysWith: { $1 })
-    }
-
-    private var _rewriterExamples: [String: String]
-    {
         switch self._spaceBefore {
         case true:
             return [
@@ -39,16 +33,14 @@ open class LeftParenSpacer: SyntaxRewriter, HasRewriterExamples
         }
     }
 
-    private var _rewriterExamplesNoChange: [String: String]
+    var rewriterNoChangeExamples: [String]
     {
-        let noChanges = [
+        return [
             "func foo() {}",
             "func foo () {}",
             "init() {}",
             "init () {}",
             ]
-
-        return [String: String](noChanges.map { ($0, $0) }, uniquingKeysWith: { $1 })
     }
 
     public init(spaceBefore: Bool = true)

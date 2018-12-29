@@ -11,12 +11,6 @@ open class ColonSpacer: SyntaxRewriter, HasRewriterExamples
 
     var rewriterExamples: [String: String]
     {
-        return _rewriterExamples
-            .merging(_rewriterExamplesNoChange, uniquingKeysWith: { $1 })
-    }
-
-    private var _rewriterExamples: [String: String]
-    {
         switch (self._spaceBefore, self._spaceAfter) {
         case (true, true):
             return [
@@ -46,17 +40,15 @@ open class ColonSpacer: SyntaxRewriter, HasRewriterExamples
     }
 
     /// - Note: `if #available(..., *)` (UnknownStmtSyntax bug) will not be handled.
-    private var _rewriterExamplesNoChange: [String: String]
+    var rewriterNoChangeExamples: [String]
     {
-        let noChanges = [
+        return [
             "[:]",
             "[ : ]",
             "[: ]",
             "[ :]",
             "arr.map(State.init(rawValue:))"
             ]
-
-        return [String: String](noChanges.map { ($0, $0) }, uniquingKeysWith: { $1 })
     }
 
     public init(spaceBefore: Bool = false, spaceAfter: Bool = true)
