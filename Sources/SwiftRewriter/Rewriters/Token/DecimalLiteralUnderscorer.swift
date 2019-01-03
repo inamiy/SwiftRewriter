@@ -24,33 +24,23 @@ open class DecimalLiteralUnderscorer: SyntaxRewriter, HasRewriterExamples
         ]
     }
 
-    open override func visit(_ syntax: IntegerLiteralExprSyntax) -> ExprSyntax
+    open override func visit(_ token: TokenSyntax) -> Syntax
     {
-        var text = syntax.digits.text
+        guard case var .integerLiteral(text) = token.tokenKind else { return token }
 
         // Ignore non-decimal-literals.
-        if text.hasPrefix("0x")
-            || text.hasPrefix("0b")
-            || text.hasPrefix("0o")
-        {
-            return super.visit(syntax)
+        if text.hasPrefix("0x") || text.hasPrefix("0b") || text.hasPrefix("0o") {
+            return token
         }
 
         text = text.replacingOccurrences(of: "_", with: "")
 
-        let limitedIndex = text.index(after: text.startIndex) // index = 1
+        let index1 = text.index(after: text.startIndex)
         var index = text.endIndex
-        while true {
-            if text.formIndex(&index, offsetBy: -3, limitedBy: limitedIndex) {
-                text.insert("_", at: index)
-            }
-            else {
-                break
-            }
+        while text.formIndex(&index, offsetBy: -3, limitedBy: index1) {
+            text.insert("_", at: index)
         }
 
-        let digits2 = syntax.digits.withKind(TokenKind.integerLiteral(text))
-
-        return super.visit(syntax.withDigits(digits2))
+        return token.withKind(.integerLiteral(text))
     }
 }
