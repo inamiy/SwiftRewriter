@@ -193,4 +193,9 @@ extension Syntax
         result.insert(contentsOf: parent.previousTokens(stop: f), at: 0)
         return result
     }
+
+    var isLastChild: Bool
+    {
+        return self.indexInParent == (self.parent?.numberOfChildren ?? 0) - 1
+    }
 }
