@@ -46,10 +46,32 @@ open class BugFixer: SyntaxRewriter
         // so replace `UnknownSyntax` with `MemberDeclList`.
         if let unknownDeclList = struct_.members.children.first(where: { $0 is UnknownSyntax }) {
             let declListItems = unknownDeclList.children
-                .compactMap { $0 as? DeclSyntax }
-                .map { decl in
-                    MemberDeclListItemSyntax.init {
-                        $0.useDecl(decl)
+                .compactMap { syntax_ -> MemberDeclListItemSyntax? in
+                    guard let decl = syntax_ as? DeclSyntax else { return nil }
+
+                    if let unknownDecl = decl as? UnknownDeclSyntax {
+                        // Try extracting `UnknownDeclSyntax`.
+                        switch (unknownDecl.child(at: 0), unknownDecl.child(at: 1)) {
+                        case let (child0 as DeclSyntax, .none):
+                            return MemberDeclListItemSyntax {
+                                $0.useDecl(child0)
+                            }
+                        case let (child0 as DeclSyntax, child1 as TokenSyntax) where child1.tokenKind == .semicolon:
+                            return MemberDeclListItemSyntax {
+                                $0.useDecl(child0)
+                                $0.useSemicolon(child1)
+                            }
+                        default:
+                            // Give up unwrapping `UnknownDeclSyntax`.
+                            return MemberDeclListItemSyntax {
+                                $0.useDecl(unknownDecl)
+                            }
+                        }
+                    }
+                    else {
+                        return MemberDeclListItemSyntax {
+                            $0.useDecl(decl)
+                        }
                     }
                 }
 
