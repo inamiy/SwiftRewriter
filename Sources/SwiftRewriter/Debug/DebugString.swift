@@ -20,7 +20,8 @@ extension Syntax
     /// Short debugging string.
     var shortDebugString: String
     {
-        return String(self.description.drop(while: { $0 == " " || $0 == "\n" }))
+        let str = String(self.description.drop(while: { $0 == " " || $0 == "\n" }))
+        return "\(str) (\(type(of: self)))"
     }
 
     /// Detailed debugging string.
