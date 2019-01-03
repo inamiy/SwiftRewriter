@@ -13,12 +13,16 @@ var rewriter: Rewriter {
         >>> ImportSorter()
 //        >>> ExtensionIniter() // not useful for everyone
 
-        // Newline
+        // Token
+        >>> DecimalLiteralUnderscorer()
+        >>> SemicolonTrimmer()
+
+        // Newline (whitespace)
 //        >>> ExtraNewliner()   // not useful for everyone
         >>> ElseNewliner(newline: false)
         >>> MethodChainNewliner()
 
-        // Indent
+        // Indent (whitespace)
         >>> Indenter(.init(
             perIndent: .spaces(4),
             shouldIndentSwitchCase: false,
@@ -27,7 +31,7 @@ var rewriter: Rewriter {
             usesXcodeStyle: true
             ))
 
-        // Space
+        // Space (whitespace)
 //        >>> ExtraSpaceTrimmer()   // may disturb manually-aligned code
 
         >>> ColonSpacer(spaceBefore: false, spaceAfter: true)
@@ -42,7 +46,4 @@ var rewriter: Rewriter {
         >>> LeftBraceSpacer(spaceBefore: true)
         >>> LeftParenSpacer(spaceBefore: true)
         >>> TrailingSpaceTrimmer()
-
-        // Token
-        >>> DecimalLiteralUnderscorer()
 }
