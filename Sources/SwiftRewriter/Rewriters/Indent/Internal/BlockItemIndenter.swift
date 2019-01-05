@@ -100,9 +100,7 @@ class BlockItemIndenter: SyntaxRewriter, HasRewriterExamples
 
         let part2 = self.visit(part) as! Part
 
-        if let syntax2 = affineTraversal.trySet(syntax, part2) {
-            syntax = syntax2
-        }
+        syntax = affineTraversal.setter(syntax, part2)
     }
 
     /// Increment indent level if `isIncremented == false` and `syntax` starts from newline.
@@ -170,9 +168,7 @@ class BlockItemIndenter: SyntaxRewriter, HasRewriterExamples
 
         let part2 = self.visit(part) as! Part
 
-        if let syntax2 = affineTraversal.trySet(syntax, part2) {
-            syntax = syntax2
-        }
+        syntax = affineTraversal.setter(syntax, part2)
     }
 
     /// - Important: Do not use this method directly. Use `_incrementIndentLevelIfNeeded` instead.

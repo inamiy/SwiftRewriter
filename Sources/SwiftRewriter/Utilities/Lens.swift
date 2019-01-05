@@ -4,6 +4,7 @@ import SwiftSyntax
 // MARK: - Lens
 
 /// Functional getter & seter.
+/// An optic used to zoom inside a product-type.
 struct Lens<Whole, Part>
 {
     let setter: (Whole, Part) -> Whole
@@ -20,6 +21,7 @@ struct Lens<Whole, Part>
 
 // MARK: - Prism
 
+/// An optic used to select part of a sum-type.
 struct Prism<Whole, Part>
 {
     let tryGet: (Whole) -> Part?
@@ -46,30 +48,33 @@ func none<A>() -> Prism<A?, ()>
 
 // MARK: - AffineTraversal
 
-/// Affine traversal using simple `Optional` rather than `Either`.
+/// An optic focused on zero or one target.
+///
+/// - Note: This type is equivalent to Scala Monocle's `Optional`.
 ///
 /// - SeeAlso:
 ///   - https://broomburgo.github.io/fun-ios/post/lenses-and-prisms-in-swift-a-pragmatic-approach/
 ///   - http://oleg.fi/gists/posts/2017-03-20-affine-traversal.html
+///   - https://julien-truffaut.github.io/Monocle/optics/optional.html
 struct AffineTraversal<Whole, Part>
 {
     let tryGet: (Whole) -> Part?
-    let trySet: (Whole, Part) -> Whole?
+    let setter: (Whole, Part) -> Whole
 
-    init(tryGet: @escaping (Whole) -> Part?, trySet: @escaping (Whole, Part) -> Whole?)
+    init(tryGet: @escaping (Whole) -> Part?, setter: @escaping (Whole, Part) -> Whole)
     {
         self.tryGet = tryGet
-        self.trySet = trySet
+        self.setter = setter
     }
 
     init(lens: Lens<Whole, Part>)
     {
-        self.init(tryGet: lens.getter, trySet: lens.setter)
+        self.init(tryGet: lens.getter, setter: lens.setter)
     }
 
     init(prism: Prism<Whole, Part>)
     {
-        self.init(tryGet: prism.tryGet, trySet: { prism.inject($1) })
+        self.init(tryGet: prism.tryGet, setter: { prism.inject($1) })
     }
 }
 
@@ -81,8 +86,13 @@ extension AffineTraversal
             tryGet: { whole -> Part2? in
                 l.tryGet(whole).flatMap { r.tryGet($0) }
             },
-            trySet: { whole, part2 in
-                l.tryGet(whole).flatMap { r.trySet($0, part2) }.flatMap { l.trySet(whole, $0) }
+            setter: { whole, part2 -> Whole in
+                if let part = l.tryGet(whole) {
+                    return l.setter(whole, r.setter(part, part2))
+                }
+                else {
+                    return whole
+                }
             }
         )
     }
