@@ -12,11 +12,11 @@
       },
       {
         "package": "Curry",
-        "repositoryURL": "https://github.com/thoughtbot/Curry.git",
+        "repositoryURL": "https://github.com/inamiy/Curry.git",
         "state": {
-          "branch": null,
-          "revision": "b6bf27ec9d711f607a8c7da9ca69ee9eaa201a22",
-          "version": "4.0.1"
+          "branch": "swift-4.2",
+          "revision": "554473509488b7426342b25b13ac151274eecc64",
+          "version": null
         }
       },
       {
@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/antitypical/Result.git",
         "state": {
           "branch": null,
-          "revision": "8fc088dcf72802801efeecba76ea8fb041fb773d",
-          "version": "4.0.0"
+          "revision": "f5a5641043bdca66ec00ea349904505b6471365b",
+          "version": "4.0.1"
         }
       },
       {
@@ -60,16 +60,16 @@
         "repositoryURL": "https://github.com/pointfreeco/swift-snapshot-testing",
         "state": {
           "branch": null,
-          "revision": "85e8ac2a2fd884856732922065dc175ca70b1de4",
-          "version": "1.0.0"
+          "revision": "129e393c6d17f7f6490fa212f19ae0d558bbd5dc",
+          "version": "1.1.0"
         }
       },
       {
         "package": "SwiftSyntax",
         "repositoryURL": "https://github.com/inamiy/swift-syntax.git",
         "state": {
-          "branch": "add-gyb-generated-files",
-          "revision": "78efe35b98f01d1d0be4dfe8bfca2a7e6b3d1d96",
+          "branch": "inamiy-swift-5.0",
+          "revision": "43954969e66aa2004c76f90ee987cd41b3e658b8",
           "version": null
         }
       }

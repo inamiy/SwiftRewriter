@@ -9,17 +9,27 @@ REPODIR = $(shell pwd)
 BUILDDIR = $(REPODIR)/.build
 SOURCES = $(wildcard $(srcdir)/**/*.swift)
 
+TOOLCHAIN_LIB = /Library/Developer/Toolchains/swift-latest.xctoolchain/usr/lib
+
 .DEFAULT_GOAL = all
 
 .PHONY: all
 all: build
 
+# NOTE: `-c release` doesn't work in `swift-DEVELOPMENT-SNAPSHOT-2019-01-10-a` for some reason...
 .PHONY: build
 build: $(SOURCES)
-	@swift build \
-		-c release \
+	swift build \
 		--disable-sandbox \
-		--build-path "$(BUILDDIR)"
+		--build-path "$(BUILDDIR)" \
+		-Xswiftc "-Fsystem" \
+		-Xswiftc "$(TOOLCHAIN_LIB)" \
+		-Xlinker "-rpath" \
+		-Xlinker "$(TOOLCHAIN_LIB)"
+
+.PHONY: xcode
+xcode:
+	swift package generate-xcodeproj --xcconfig-overrides Configuration/Config.xcconfig
 
 .PHONY: install
 install: build
