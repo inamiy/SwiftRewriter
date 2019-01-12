@@ -98,7 +98,7 @@ func parseString(_ source: String) throws -> SourceFileSyntax
 
     try source.write(to: sourceURL, atomically: true, encoding: .utf8)
 
-    let syntax = try SyntaxTreeParser.parse(sourceURL)
+    let syntax = try SyntaxParser.parse(sourceURL)
 
     return BugFixer().parse(syntax)
 }
@@ -124,7 +124,7 @@ func parseTestFile(
         .appendingPathComponent("\(function.dropLast(2)).\(sourceFileName)")
         .appendingPathExtension("swift")
 
-    let syntax = try SyntaxTreeParser.parse(testSourceFileUrl)
+    let syntax = try SyntaxParser.parse(testSourceFileUrl)
 
     return BugFixer().parse(syntax)
 }

@@ -1,6 +1,7 @@
 import Foundation
 import Result
 import Commandant
+import SwiftSyntax
 
 let registry = CommandRegistry<AnyError>()
 

@@ -45,7 +45,7 @@ extension Rewriter
 {
     public static func parse(sourceFileURL: URL) throws -> SourceFileSyntax
     {
-        return try SyntaxTreeParser.parse(sourceFileURL)
+        return try SyntaxParser.parse(sourceFileURL)
     }
 
     public static func parse(string: String) throws -> SourceFileSyntax
