@@ -98,7 +98,7 @@ var rewriter: Rewriter {
      .code {
      }
      .format {
-−} // this!!!
+-} // this!!!
 +    } // this!!!
 ```
 
@@ -148,14 +148,14 @@ struct Foo {
 
 ```diff
 @@ −1,10 +1,2 @@
-−//
-−//  example.swift
-−//  SwiftRewriter
-−//
-−//  Created by Yasuhiro Inami on 2018-12-09.
-−//  Copyright © 2018 Yasuhiro Inami. All rights reserved.
-−//
-−
+-//
+-//  example.swift
+-//  SwiftRewriter
+-//
+-//  Created by Yasuhiro Inami on 2018-12-09.
+-//  Copyright © 2018 Yasuhiro Inami. All rights reserved.
+-//
+-
  // All your code are belong to us.
 ```
 
