@@ -17,9 +17,19 @@ all: build
 # NOTE: `-c release` doesn't work in `swift-DEVELOPMENT-SNAPSHOT-2019-01-10-a` for some reason...
 .PHONY: build
 build: $(SOURCES)
-	@swift build \
+	swift build \
+		--configuration release \
 		--disable-sandbox \
 		--build-path "$(BUILDDIR)"
+
+.PHONY: build-release
+build-release: $(SOURCES)
+	swift build \
+		--configuration release \
+		--disable-sandbox \
+		--build-path "$(BUILDDIR)" \
+		--verbose \
+		-Xswiftc "-enforce-exclusivity=unchecked"
 
 .PHONY: xcode
 xcode:
