@@ -18,7 +18,7 @@ all: build
 .PHONY: build
 build: $(SOURCES)
 	swift build \
-		--configuration release \
+		--configuration debug \
 		--disable-sandbox \
 		--build-path "$(BUILDDIR)"
 
