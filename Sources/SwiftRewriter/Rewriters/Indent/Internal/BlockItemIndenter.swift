@@ -230,19 +230,7 @@ class BlockItemIndenter: SyntaxRewriter, HasRewriterExamples
 
     override func visit(_ syntax: CodeBlockItemListSyntax) -> Syntax
     {
-        let canIndent = self._canIndentAfterIfConfig.last == true
-
-        if !canIndent {
-            self._canIndentAfterIfConfig.append(true)
-        }
-
-        defer {
-            if !canIndent {
-                self._canIndentAfterIfConfig.removeLast()
-            }
-        }
-
-        return self._visitChildrenAndIndentIfNeeded(syntax, canIndent: canIndent)
+        return self._visitChildrenAndIndentIfNeeded(syntax)
     }
 
     // MARK: MemberDeclListSyntax
@@ -389,9 +377,21 @@ class BlockItemIndenter: SyntaxRewriter, HasRewriterExamples
     }
 
     /// Visit children to try indent increment (at most 1).
-    private func _visitChildrenAndIndentIfNeeded<T>(_ syntax: T, canIndent: Bool = true, line: Int = #line) -> T
+    private func _visitChildrenAndIndentIfNeeded<T>(_ syntax: T, line: Int = #line) -> T
         where T: SyntaxCollection
     {
+        let canIndent = self._canIndentAfterIfConfig.last == true
+
+        if !canIndent {
+            self._canIndentAfterIfConfig.append(true)
+        }
+
+        defer {
+            if !canIndent {
+                self._canIndentAfterIfConfig.removeLast()
+            }
+        }
+
         /// - Note: This flag will become from `false` to `true` at most once.
         var isIncremented: Bool = !canIndent
 

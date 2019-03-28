@@ -1709,11 +1709,11 @@ final class BlockItemIndenterTests: XCTestCase
                 struct Foo {
                     let foo: Bool
                     #if DEBUG
-                    let debug: Bool
-                    func debug() {}
+                        let debug: Bool
+                        func debug() {}
                     #else
-                    let release: Bool
-                    func release() {}
+                        let release: Bool
+                        func release() {}
                     #endif
                     func foo() {}
                 }
