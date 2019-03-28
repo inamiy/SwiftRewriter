@@ -10,9 +10,9 @@ let package = Package(
             targets: ["SwiftRewriter"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/inamiy/swift-syntax.git", .branch("add-gyb-generated-files")),
+        .package(url: "https://github.com/apple/swift-syntax.git", .exact("0.50000.0")),
         .package(url: "https://github.com/Carthage/Commandant.git", from: "0.15.0"),
-        .package(url: "https://github.com/thoughtbot/Curry.git", from: "4.0.0"),
+        .package(url: "https://github.com/thoughtbot/Curry.git", from: "4.0.2"),
         .package(url: "https://github.com/JohnSundell/Files.git", from: "2.2.1"),
         .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.0.0")
     ],
