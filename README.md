@@ -1,11 +1,11 @@
 # 📝 SwiftRewriter
 
-[![Swift 4.2](https://img.shields.io/badge/swift-4.2-orange.svg?style=flat)](https://swift.org/download/)
+[![Swift 5.0](https://img.shields.io/badge/swift-5.0-orange.svg?style=flat)](https://swift.org/download/)
 [![Build Status](https://travis-ci.org/inamiy/SwiftRewriter.svg?branch=master)](https://travis-ci.org/inamiy/SwiftRewriter)
 
 Swift code formatter using [SwiftSyntax](https://github.com/apple/swift-syntax).
 
-**Requirements:** Swift 4.2 (Xcode 10)
+**Requirements:** Swift 5.0 (Xcode 10.2) + SwiftSyntax 0.50000.0
 
 (**Note:** Currently using a forked version [inamiy/swift-syntax](https://github.com/inamiy/swift-syntax) to include gyb-generated files)
 
