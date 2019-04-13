@@ -9,12 +9,12 @@ import Y
 
 import Z
 
+func hoge() {}
+
 /**
  * doc
  */
 public func hello() {}
-
-func hoge() {}
 
 let x = 1 // comment
 

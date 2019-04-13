@@ -13,7 +13,7 @@ open class BinaryOperatorSpacer: SyntaxRewriter, HasRewriterExamples
 
     private let _spaceHandler: TokenHandler
 
-    private var _unknownStmtCount = 0
+    private var _availabilityConditionCount = 0
     private var _attributeCount = 0
 
     var rewriterExamples: [String: String]
@@ -44,14 +44,13 @@ open class BinaryOperatorSpacer: SyntaxRewriter, HasRewriterExamples
             "reduce(+)", "reduce(+ )", "reduce( +)", "reduce( + )",
             "User.table[*]", "User.table[* ]", "User.table[ *]", "User.table[ * ]", // e.g. SQLite.swift
 
-            // UnknownStmtSyntax bug in SwiftSyntax
-            "if #available(iOS 11.0, *) {}",
-            "if #available(iOS 11.0, * ) {}",
+            // "*" in `AvailabilityConditionSyntax` will be ignored.
             "if #available(iOS 11.0,*) {}",
+            "if #available(iOS 11.0, * ) {}",
 
-            // UnknownDeclSyntax bug in SwiftSyntax
-            "@available(*, deprecated, message: \"...\")",
-            "@available( * , deprecated, message: \"...\")"
+            // "*" in `AttributeSyntax` will be ignored.
+            "@available(*, deprecated, message: \"...\")\nfunc foo()",
+            "@available( * , deprecated, message: \"...\")\nfunc foo()"
         ]
     }
 
@@ -83,11 +82,11 @@ open class BinaryOperatorSpacer: SyntaxRewriter, HasRewriterExamples
         self._spaceHandler = spaceBeforeHandler <+> spaceAfterHandler
     }
 
-    // Workaround for `if #available(..., *)` (UnknownStmtSyntax bug).
-    open override func visit(_ syntax: UnknownStmtSyntax) -> StmtSyntax
+    // Ignore `*` treated as binaryOperator in `if #available(..., *)`.
+    open override func visit(_ syntax: AvailabilityConditionSyntax) -> Syntax
     {
-        self._unknownStmtCount += 1
-        defer { self._unknownStmtCount -= 1 }
+        self._availabilityConditionCount += 1
+        defer { self._availabilityConditionCount -= 1 }
 
         return super.visit(syntax)
     }
@@ -103,7 +102,7 @@ open class BinaryOperatorSpacer: SyntaxRewriter, HasRewriterExamples
 
     open override func visit(_ token: TokenSyntax) -> Syntax
     {
-        guard self._unknownStmtCount == 0
+        guard self._availabilityConditionCount == 0
             && self._attributeCount == 0 else
         {
             return super.visit(token)

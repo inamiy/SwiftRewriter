@@ -1,13 +1,16 @@
 # 📝 SwiftRewriter
 
-[![Swift 4.2](https://img.shields.io/badge/swift-4.2-orange.svg?style=flat)](https://swift.org/download/)
+[![Swift 5.0](https://img.shields.io/badge/swift-5.0-orange.svg?style=flat)](https://swift.org/download/)
 [![Build Status](https://travis-ci.org/inamiy/SwiftRewriter.svg?branch=master)](https://travis-ci.org/inamiy/SwiftRewriter)
 
 Swift code formatter using [SwiftSyntax](https://github.com/apple/swift-syntax).
 
-**Requirements:** Swift 4.2 (Xcode 10)
+**Requirements:** Swift 5.0 (Xcode 10.2) + SwiftSyntax 0.50000.0
 
-(**Note:** Currently using a forked version [inamiy/swift-syntax](https://github.com/inamiy/swift-syntax) to include gyb-generated files)
+See also my [iOSConf SG 2019](https://2019.iosconf.sg) talk for more detail:
+
+- Slide: [Making your own Code Formatter in Swift \- Speaker Deck](https://speakerdeck.com/inamiy/making-your-own-code-formatter-in-swift)
+- Video: [Make your own code formatter in Swift – iOS Conf SG 2019 – Learn Talks](https://learntalks.com/2019/01/make-your-own-code-formatter-in-swift-ios-conf-sg-2019/)
 
 ## Overview
 
@@ -98,7 +101,7 @@ var rewriter: Rewriter {
      .code {
      }
      .format {
-−} // this!!!
+-} // this!!!
 +    } // this!!!
 ```
 
@@ -148,14 +151,14 @@ struct Foo {
 
 ```diff
 @@ −1,10 +1,2 @@
-−//
-−//  example.swift
-−//  SwiftRewriter
-−//
-−//  Created by Yasuhiro Inami on 2018-12-09.
-−//  Copyright © 2018 Yasuhiro Inami. All rights reserved.
-−//
-−
+-//
+-//  example.swift
+-//  SwiftRewriter
+-//
+-//  Created by Yasuhiro Inami on 2018-12-09.
+-//  Copyright © 2018 Yasuhiro Inami. All rights reserved.
+-//
+-
  // All your code are belong to us.
 ```
 
