@@ -61,7 +61,8 @@ class FirstItemAwareIndenter: SyntaxRewriter
 
         syntax2 = syntax2.withElements(self._adjustItemIndents(syntax.elements))
 
-        let firstItemIndent = syntax.elements.positionAfterSkippingLeadingTrivia.column - 1
+        let column = syntax.elements.startLocation(converter: .init(tree: self.sourceFile)).column ?? 1
+        let firstItemIndent = column - 1
 
         // If array has tail comment before `]`, adjust comment's indent as well,
         // e.g. `[1,\n/* hello */]`, but not for `[1,\n/* hello */\n]` and `[1,\n234/* hello */\n]`.
@@ -90,7 +91,8 @@ class FirstItemAwareIndenter: SyntaxRewriter
 
         syntax2 = syntax2.withContent(self._adjustItemIndents(content))
 
-        let firstItemIndent = content.positionAfterSkippingLeadingTrivia.column - 1
+        let column = content.startLocation(converter: .init(tree: self.sourceFile)).column ?? 1
+        let firstItemIndent = column - 1
 
         // If dictionary has tail comment before `]`, adjust comment's indent as well.
         if syntax2.rightSquare.leadingTrivia.contains(where: { $0.isComment })
@@ -114,18 +116,20 @@ class FirstItemAwareIndenter: SyntaxRewriter
     private func _adjustItemIndents<T>(_ syntax: T) -> T
         where T: SyntaxCollection, T.Element: Syntax
     {
-        guard let firstItem = syntax.first,
-            firstItem.leadingTriviaLength.newlines == 0 else
+        guard let firstItem = syntax.first(where: { _ in true }),
+            firstItem.leadingTrivia?.hasNewline == false else
         {
             return syntax
         }
 
-        let firstItemIndent = syntax.positionAfterSkippingLeadingTrivia.column - 1
+
+        let column = syntax.startLocation(converter: .init(tree: self.sourceFile)).column ?? 1
+        let firstItemIndent = column - 1
 
         var syntax2 = syntax
 
         for (i, item) in syntax2.enumerated()
-            where item.leadingTriviaLength.newlines > 0
+            where item.leadingTrivia?.hasNewline == true
         {
             if i == 0 { continue }
 

@@ -7,44 +7,44 @@ open class ElseNewliner: SyntaxRewriter
 {
     private typealias _TokensHandler = OptionalKleisli<(leadingToken: TokenSyntax?, currentToken: TokenSyntax), TokenSyntax>
 
-    private let _newlineHandler: _TokensHandler
+    private lazy var _newlineHandler: _TokensHandler = {
+        if self.newline {
+            return _TokensHandler { leadingToken, token in
+                guard !token.leadingTrivia.hasNewline
+                    && token.leadingTrivia.allSatisfy({ !$0.isComment }) else
+                {
+                    return nil
+                }
+
+                let column = leadingToken?.startLocation(converter: .init(tree: self.sourceFile)).column ?? 1
+                let indentSpaces = column - 1
+                return token.withLeadingTrivia(.newlines(1) + .spaces(indentSpaces))
+            }
+        }
+        else {
+            return _TokensHandler { leadingToken, token in
+                guard token.leadingTrivia.hasNewline
+                    && token.leadingTrivia.allSatisfy({ !$0.isComment }) else {
+                        return nil
+                }
+
+                return token.withLeadingTrivia(.spaces(1))
+            }
+        }
+    }()
+
+    private let newline: Bool
 
     private var _leadingToken: TokenSyntax?
 
     public init(newline: Bool)
     {
-        func makeTokenHandler(shouldInsert: Bool) -> _TokensHandler
-        {
-            if shouldInsert {
-                return _TokensHandler { leadingToken, token in
-                    guard token.leadingTriviaLength.newlines == 0
-                        && token.leadingTrivia.allSatisfy({ !$0.isComment }) else
-                    {
-                        return nil
-                    }
-
-                    let indentSpaces = (leadingToken?.positionAfterSkippingLeadingTrivia.column ?? 1) - 1
-                    return token.withLeadingTrivia(.newlines(1) + .spaces(indentSpaces))
-                }
-            }
-            else {
-                return _TokensHandler { leadingToken, token in
-                    guard token.leadingTriviaLength.newlines > 0
-                        && token.leadingTrivia.allSatisfy({ !$0.isComment }) else {
-                        return nil
-                    }
-
-                    return token.withLeadingTrivia(.spaces(1))
-                }
-            }
-        }
-
-        self._newlineHandler = makeTokenHandler(shouldInsert: newline)
+        self.newline = newline
     }
 
     open override func visit(_ token: TokenSyntax) -> Syntax
     {
-        if token.leadingTriviaLength.newlines > 0 {
+        if token.leadingTrivia.hasNewline {
             self._leadingToken = token
         }
 

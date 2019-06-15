@@ -49,9 +49,6 @@ import SwiftRewriter
 /// Global rewriter.
 var rewriter: Rewriter {
     return
-        // Workaround for SwiftSyntax bug (required)
-        BugFixer()
-
         // Comment
         >>> HeaderCopyrightTrimmer()
 
