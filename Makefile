@@ -14,7 +14,6 @@ SOURCES = $(wildcard $(srcdir)/**/*.swift)
 .PHONY: all
 all: build
 
-# NOTE: `-c release` doesn't work in `swift-DEVELOPMENT-SNAPSHOT-2019-01-10-a` for some reason...
 .PHONY: build
 build: $(SOURCES)
 	swift build \

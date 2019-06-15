@@ -31,7 +31,7 @@ open class ExtensionIniter: SyntaxRewriter
                     members: MemberDeclBlockSyntax.init({ builder in
                         builder.useLeftBrace(SyntaxFactory.makeLeftBraceToken(leadingTrivia: [.spaces(1)]))
                         for init_ in inits {
-                            builder.addMemberDeclListItem(MemberDeclListItemSyntax.init { b in
+                            builder.addMember(MemberDeclListItemSyntax { b in
                                 b.useDecl(init_)
                             })
                         }

@@ -2,14 +2,29 @@ import SwiftSyntax
 
 // MARK: - SyntaxCollection
 
+/// Workaround protocol to be used as an existential container.
+public protocol _SyntaxCollection
+{
+    var count: Int { get }
+}
+
 /// `Syntax` + `Collection`.
 ///
 /// - Note: Removed `where Element: Syntax` because of error:
 ///   > Using 'ExprSyntax' as a concrete type conforming to protocol 'Syntax' is not supported
-public protocol SyntaxCollection: Syntax, Collection
-    where /* Element: Syntax, */ Index == Int
+public protocol SyntaxCollection: SwiftSyntax.SyntaxCollection, _SyntaxCollection
 {
     func replacing(childAt index: Int, with syntax: Element) -> Self
+}
+
+extension Syntax
+{
+    /// - Complexity: O(n) performance
+    /// https://github.com/apple/swift-syntax/commit/f024a1fde86e63387628dceba9103df866a5e4ba
+    func child(at index: Int) -> Syntax?
+    {
+        return self.children.dropFirst(index).first(where: { _ in true })
+    }
 }
 
 // WARNING: Conformance list is not complete.

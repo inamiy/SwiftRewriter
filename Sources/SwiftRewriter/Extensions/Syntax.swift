@@ -3,13 +3,37 @@ import SwiftSyntax
 extension Syntax
 {
     /// `Syntax` is in `(line, column) == (1, 1)`.
-    public var containsFirstToken: Bool
+    var containsFirstToken: Bool
     {
-        return self.position.line == 1 && self.position.column == 1
+        return self.position.utf8Offset == 0
+    }
+
+    /// Number of lines excluding leading & trailing trivias.
+    var numberOfContentLines: Int
+    {
+        var isFirstLeadingTrivia = true
+        var lastTrailingTrivia = 0
+        var total = 1
+
+        for token in self.tokens {
+            if isFirstLeadingTrivia {
+                isFirstLeadingTrivia = false
+            }
+            else {
+                total += token.leadingTrivia.numberOfNewlines
+            }
+
+            lastTrailingTrivia = token.trailingTrivia.numberOfNewlines
+            total += lastTrailingTrivia
+        }
+
+        total -= lastTrailingTrivia
+
+        return total
     }
 
     /// Find 1st descendant (excluding `self`).
-    public func ancestor<T>(where f: (Syntax) -> T?) -> T?
+    func ancestor<T>(where f: (Syntax) -> T?) -> T?
     {
         var current: Syntax = self
         while let parent = current.parent {
@@ -23,7 +47,7 @@ extension Syntax
     }
 
     /// Find 1st descendant (excluding `self`).
-    public func descendant<T>(where f: (Syntax) -> T?) -> T?
+    func descendant<T>(where f: (Syntax) -> T?) -> T?
     {
         for child in self.children {
             if let child = f(child) {
@@ -36,8 +60,6 @@ extension Syntax
 
         return nil
     }
-
-    // MARK: - Descendants in ascending / descending order
 
     /// Traverse in ascending order (including `self`).
     private func _descendantsInAscending<T>(where f: (Syntax) -> (T?, stop: Bool)) -> ([T], stop: Bool)
@@ -107,95 +129,18 @@ extension Syntax
         return (result, false)
     }
 
-    /// Find `self` or `parent`'s next sibling's `TokenSyntax`.
-    /// - Note: `self` and its descendants are not included.
-    public var nextToken: TokenSyntax?
-    {
-        return self.nextTokens(stop: { _ in true }).first
-    }
-
-    /// Collect `self`'s or `parent`'s next sibling's `TokenSyntax`s.
-    /// - Note: `self` and its descendants are not included.
-    public func nextTokens(stop f: (TokenSyntax) -> Bool) -> [TokenSyntax]
-    {
-        guard let parent = self.parent else {
-            return []
-        }
-
-        let siblings = parent.children.drop(while: { !($0 == self) }).dropFirst()
-        var result = [TokenSyntax]()
-
-        for sibling in siblings {
-            let (tokens, stop) = sibling
-                ._descendantsInAscending(where: { syntax -> (TokenSyntax?, Bool) in
-                    if let token = syntax as? TokenSyntax {
-                        return (token, f(token))
-                    }
-                    else {
-                        return (nil, false)
-                    }
-                })
-
-            result.append(contentsOf: tokens)
-
-            if stop {
-                return result
-            }
-        }
-
-        result.append(contentsOf: parent.nextTokens(stop: f))
-        return result
-    }
-
-    /// Find `self`'s or `parent`'s previous sibling's `TokenSyntax`.
-    /// - Note: `self` and its descendants are not included.
-    public var previousToken: TokenSyntax?
-    {
-        return self.previousTokens(stop: { _ in true }).first
-    }
-
-    /// Collect `self`'s or `parent`'s previous sibling's `TokenSyntax`s.
-    ///
-    /// For example, this is useful to collect current line's tokens until `self`:
-    ///
-    ///     let previousTokens = syntax.previousTokens(stop: {
-    ///         return $0.leadingTriviaLength.newlines > 0
-    ///     })
-    ///
-    /// - Note: `self` and its descendants are not included.
-    public func previousTokens(stop f: (TokenSyntax) -> Bool) -> [TokenSyntax]
-    {
-        guard let parent = self.parent else {
-            return []
-        }
-
-        let siblings = parent.children.prefix(while: { !($0 == self) }).reversed()
-        var result = [TokenSyntax]()
-
-        for sibling in siblings {
-            let (tokens, stop) = sibling
-                ._descendantsInDescending(where: { syntax -> (TokenSyntax?, Bool) in
-                    if let token = syntax as? TokenSyntax {
-                        return (token, f(token))
-                    }
-                    else {
-                        return (nil, false)
-                    }
-                })
-
-            result.insert(contentsOf: tokens, at: 0)
-
-            if stop {
-                return result
-            }
-        }
-
-        result.insert(contentsOf: parent.previousTokens(stop: f), at: 0)
-        return result
-    }
-
     var isLastChild: Bool
     {
-        return self.indexInParent == (self.parent?.numberOfChildren ?? 0) - 1
+        let parent = self.parent as? _SyntaxCollection
+        return self.indexInParent == (parent?.count ?? 0) - 1
+    }
+}
+
+extension SourceLocationConverter
+{
+    convenience init(tree: SourceFileSyntax)
+    {
+        // NOTE: `file` is not needed.
+        self.init(file: "", tree: tree)
     }
 }

@@ -1,5 +1,4 @@
 import Foundation
-import Result
 import Curry
 import Commandant
 import Files
@@ -69,9 +68,9 @@ public struct RunOptions: OptionsProtocol
     fileprivate let path: String
     fileprivate let debug: Bool
 
-    public static func evaluate(_ m: CommandMode) -> Result<RunOptions, CommandantError<AnyError>>
+    public static func evaluate(_ m: CommandMode) -> Result<RunOptions, CommandantError<Swift.Error>>
     {
-        return curry(self.init)
+        return curry(Self.init)
             <*> m <| pathOption(action: "run")
             <*> m <| Switch(flag: "d", key: "debug", usage: "DEBUG")
     }

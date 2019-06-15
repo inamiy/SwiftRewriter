@@ -18,8 +18,8 @@ open class ExtraNewliner: SyntaxRewriter
     {
         let isFirstLine = syntax.containsFirstToken
 
-        // Skip inserting newline if `syntax` only has 1 or 2 lines (less than 2 "\n"s).
-        guard isFirstLine || syntax.contentLength.newlines >= 2 else {
+        // Skip inserting newline if `syntax` only has 1 or 2 lines (less than 3 "\n"s).
+        guard isFirstLine || syntax.numberOfContentLines >= 3 else {
             return syntax
         }
 
@@ -39,8 +39,8 @@ open class ExtraNewliner: SyntaxRewriter
                     // Let newline NOT be inserted when 2 consecutive `T.Element`s have
                     // same child type (e.g. `GuardStmtSyntax`)
                     // and both `newlines` are 1 or less (= comments are probably not included).
-                    || (child1.trailingTriviaLength.newlines <= 1
-                        && child2.leadingTriviaLength.newlines <= 1
+                    || (child1.trailingTrivia!.numberOfNewlines <= 1
+                        && child2.leadingTrivia!.numberOfNewlines <= 1
                         && firstChildType(child1) == firstChildType(child2))
                 {
                     return false

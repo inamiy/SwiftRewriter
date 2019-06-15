@@ -1,5 +1,16 @@
 import SwiftSyntax
 
+open class SyntaxRewriter: SwiftSyntax.SyntaxRewriter
+{
+    internal var sourceFile: SourceFileSyntax!
+
+    public override func visit(_ syntax: SourceFileSyntax) -> Syntax
+    {
+        self.sourceFile = syntax
+        return super.visit(syntax)
+    }
+}
+
 /// Add a newline before method-chaining's `dot` if preceding block is multiline.
 ///
 /// # Example
@@ -26,7 +37,7 @@ open class MethodChainNewliner: SyntaxRewriter
     open override func visit(_ syntax: MemberAccessExprSyntax) -> ExprSyntax
     {
         // Skip already newlined `dot`.
-        guard syntax.dot.leadingTriviaLength.newlines == 0 else {
+        guard !syntax.dot.leadingTrivia.hasNewline else {
             return super.visit(syntax)
         }
 
@@ -38,7 +49,7 @@ open class MethodChainNewliner: SyntaxRewriter
         {
             // If `funcCall - memberAccess2` (= func arg content) has multiple lines,
             // let `dot` have a newline.
-            if funcCall.contentLength.newlines - memberAccess2.contentLength.newlines > 0 {
+            if funcCall.numberOfContentLines - memberAccess2.numberOfContentLines > 0 {
                 var dot = syntax2.dot
                 dot = dot.with(.leadingTrivia, replacingLastSpaces: [.newlines(1)])
                 syntax2 = syntax2.withDot(dot)

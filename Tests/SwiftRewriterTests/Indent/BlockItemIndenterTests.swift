@@ -130,9 +130,9 @@ final class BlockItemIndenterTests: XCTestCase
     {
         let source = """
             if let error = error,
-                error.isTimeout
-                    || error.isUnavailable {
-                print()
+            error.isTimeout
+            || error.isUnavailable {
+            print()
             }
             """
 

@@ -86,7 +86,7 @@ open class ImportSorter: SyntaxRewriter
 
             newItemList = newItemList.appending(newItem)
 
-            previousHasTrailingNewline = item.trailingTriviaLength.newlines > 0
+            previousHasTrailingNewline = item.trailingTrivia?.hasNewline == true
         }
 
         return super.visit(newItemList)
