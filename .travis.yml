@@ -4,6 +4,10 @@ env:
 
 osx_image: xcode10.2
 
+branches:
+  only:
+    - master
+
 matrix:
   include:
     - os: osx
