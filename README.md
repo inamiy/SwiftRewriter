@@ -1,6 +1,6 @@
 # 📝 SwiftRewriter
 
-[![Swift 5.0](https://img.shields.io/badge/swift-5.0-orange.svg?style=flat)](https://swift.org/download/)
+[![Swift 5.1](https://img.shields.io/badge/swift-5.1-orange.svg?style=flat)](https://swift.org/download/)
 [![Build Status](https://travis-ci.org/inamiy/SwiftRewriter.svg?branch=master)](https://travis-ci.org/inamiy/SwiftRewriter)
 
 Swift code formatter using [SwiftSyntax](https://github.com/apple/swift-syntax).
