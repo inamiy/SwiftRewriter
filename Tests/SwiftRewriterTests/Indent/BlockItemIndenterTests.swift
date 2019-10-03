@@ -289,6 +289,49 @@ final class BlockItemIndenterTests: XCTestCase
         )
     }
 
+    func test_genericWhereClause() throws
+    {
+        let source = """
+            struct Foo<T>
+            where T: Equatable {
+            }
+            enum Foo<T>
+            where T: Equatable {
+            }
+            class Foo<T>
+            where T: Equatable {
+            }
+            protocol P
+            where Self: UIView {
+            associatedtype Sub: SubP
+            where Self.Element == Self.SubP.Element
+            }
+            """
+
+        let expected = """
+            struct Foo<T>
+                where T: Equatable {
+            }
+            enum Foo<T>
+                where T: Equatable {
+            }
+            class Foo<T>
+                where T: Equatable {
+            }
+            protocol P
+                where Self: UIView {
+                associatedtype Sub: SubP
+                    where Self.Element == Self.SubP.Element
+            }
+            """
+
+        try runTest(
+            source: source,
+            expected: expected,
+            using: BlockItemIndenter()
+        )
+    }
+
     // NOTE: `FirstItemAwareIndenter` handles better indent.
     func test_tuplePatternElementList() throws
     {

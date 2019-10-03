@@ -604,6 +604,9 @@ class BlockItemIndenter: SyntaxRewriter, HasRewriterExamples
         return syntax2
     }
 
+    // MARK: WhereClauseSyntax
+
+    /// e.g. `case ... where ...`
     override func visit(_ syntax: WhereClauseSyntax) -> Syntax
     {
         var syntax2 = syntax
@@ -627,6 +630,29 @@ class BlockItemIndenter: SyntaxRewriter, HasRewriterExamples
 
         return syntax2
     }
+
+    // MARK: GenericWhereClauseSyntax
+
+    override func visit(_ syntax: GenericWhereClauseSyntax) -> Syntax
+    {
+        var syntax2 = syntax
+        var isIncremented: Bool = false
+
+        self._incrementIndentLevelIfNeeded(
+            lens: .whereKeyword,
+            syntax: &syntax2,
+            isIncremented: &isIncremented
+        )
+
+        self._visit(lens: .requirementList, syntax: &syntax2)
+
+        if isIncremented {
+            self._decrementIndentLevel(tag: syntax)
+        }
+
+        return syntax2
+    }
+
 
     // MARK: - ExprSyntax
 
