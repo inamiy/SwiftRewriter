@@ -5,7 +5,7 @@
 
 Swift code formatter using [SwiftSyntax](https://github.com/apple/swift-syntax).
 
-**Requirements:** Swift 5.0 (Xcode 10.2) + SwiftSyntax 0.50000.0
+**Requirements:** Swift 5.1 (Xcode 11.0) + SwiftSyntax 0.50100.0
 
 See also my [iOSConf SG 2019](https://2019.iosconf.sg) talk for more detail:
 
