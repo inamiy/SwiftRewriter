@@ -24,8 +24,7 @@ var rewriter: Rewriter {
             perIndent: .spaces(4),
             shouldIndentSwitchCase: false,
             shouldIndentIfConfig: false,
-            skipsCommentedLine: true,
-            usesXcodeStyle: true
+            skipsCommentedLine: true
             ))
 
         // Space (whitespace)

@@ -11,8 +11,7 @@ public struct Indenter: SyntaxRewriterProtocol
             perIndent: configuration.perIndent,
             shouldIndentSwitchCase: configuration.shouldIndentSwitchCase,
             shouldIndentIfConfig: configuration.shouldIndentIfConfig,
-            skipsCommentedLine: configuration.skipsCommentedLine,
-            usesXcodeStyle: configuration.usesXcodeStyle
+            skipsCommentedLine: configuration.skipsCommentedLine
         )
 
         let firstItemAwareIndenter = FirstItemAwareIndenter()
@@ -34,21 +33,18 @@ extension Indenter
         public let shouldIndentSwitchCase: Bool
         public let shouldIndentIfConfig: Bool
         public let skipsCommentedLine: Bool
-        public let usesXcodeStyle: Bool
 
         public init(
             perIndent: PerIndent = .spaces(4),
             shouldIndentSwitchCase: Bool = false,
             shouldIndentIfConfig: Bool = false,
-            skipsCommentedLine: Bool = true,
-            usesXcodeStyle: Bool = true
+            skipsCommentedLine: Bool = true
             )
         {
             self.perIndent = perIndent
             self.shouldIndentSwitchCase = shouldIndentSwitchCase
             self.shouldIndentIfConfig = shouldIndentIfConfig
             self.skipsCommentedLine = skipsCommentedLine
-            self.usesXcodeStyle = usesXcodeStyle
         }
     }
 }
