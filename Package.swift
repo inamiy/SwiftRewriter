@@ -10,7 +10,7 @@ let package = Package(
             targets: ["SwiftRewriter"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-syntax.git", .revision("xcode11-beta1")),
+        .package(url: "https://github.com/apple/swift-syntax.git", .exact("0.50100.0")),
         .package(url: "https://github.com/Carthage/Commandant.git", from: "0.17.0"),
         .package(url: "https://github.com/thoughtbot/Curry.git", from: "4.0.2"),
         .package(url: "https://github.com/JohnSundell/Files.git", from: "2.2.1"),
