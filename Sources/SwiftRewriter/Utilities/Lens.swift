@@ -128,6 +128,77 @@ func >>> <Whole, Part, Part2>(l: AffineTraversal<Whole, Part>, r: Prism<Part, Pa
     return l >>> .init(prism: r)
 }
 
+// MARK: - StructDeclSyntax
+
+extension Lens where Whole == StructDeclSyntax, Part == AttributeListSyntax?
+{
+    /// Cursor 0
+    static let attributes = Lens(
+        setter: { $0.withAttributes($1) },
+        getter: { $0.attributes }
+    )
+}
+
+extension Lens where Whole == StructDeclSyntax, Part == ModifierListSyntax?
+{
+    /// Cursor 1
+    static let modifiers = Lens(
+        setter: { $0.withModifiers($1) },
+        getter: { $0.modifiers }
+    )
+}
+
+extension Lens where Whole == StructDeclSyntax, Part == TokenSyntax
+{
+    /// Cursor 2
+    static let structKeyword = Lens(
+        setter: { $0.withStructKeyword($1) },
+        getter: { $0.structKeyword }
+    )
+
+    /// Cursor 3
+    static let identifier = Lens(
+        setter: { $0.withIdentifier($1) },
+        getter: { $0.identifier }
+    )
+}
+
+extension Lens where Whole == StructDeclSyntax, Part == GenericParameterClauseSyntax?
+{
+    /// Cursor 4
+    static let genericParameterClause = Lens(
+        setter: { $0.withGenericParameterClause($1) },
+        getter: { $0.genericParameterClause }
+    )
+}
+
+extension Lens where Whole == StructDeclSyntax, Part == TypeInheritanceClauseSyntax?
+{
+    /// Cursor 5
+    static let inheritanceClause = Lens(
+        setter: { $0.withInheritanceClause($1) },
+        getter: { $0.inheritanceClause }
+    )
+}
+
+extension Lens where Whole == StructDeclSyntax, Part == GenericWhereClauseSyntax?
+{
+    /// Cursor 6
+    static let genericWhereClause = Lens(
+        setter: { $0.withGenericWhereClause($1) },
+        getter: { $0.genericWhereClause }
+    )
+}
+
+extension Lens where Whole == StructDeclSyntax, Part == MemberDeclBlockSyntax
+{
+    /// Cursor 7
+    static let body = Lens(
+        setter: { $0.withMembers($1) },
+        getter: { $0.members }
+    )
+}
+
 // MARK: - InitializerDeclSyntax
 
 extension Lens where Whole == InitializerDeclSyntax, Part == AttributeListSyntax?
