@@ -7,11 +7,9 @@ final class BlockItemIndenterTests: XCTestCase
     func test_examples() throws
     {
         let perIndent = [PerIndent.spaces(4), .tabs(1)].randomElement()!
-        let usesXcodeStyle = Bool.random()
 
         try runExamples(using: BlockItemIndenter(
-            perIndent: perIndent,
-            usesXcodeStyle: usesXcodeStyle
+            perIndent: perIndent
         ))
     }
 
@@ -476,9 +474,9 @@ final class BlockItemIndenterTests: XCTestCase
             init(
                 x: Int,
                 y: Int
-                ) where
-                    T: T1,
-                    U == U1 {
+            ) where
+                T: T1,
+                U == U1 {
                 print()
             }
             """
@@ -527,7 +525,7 @@ final class BlockItemIndenterTests: XCTestCase
                 func foo   (
                     aaa: Int,
                     bb: Int
-                    ) {}
+                ) {}
             }
             """
 
@@ -610,7 +608,7 @@ final class BlockItemIndenterTests: XCTestCase
         let expected = """
             func foo<T, U>(
                 x: Int
-                ) where
+            ) where
                 T: T1,
                 U == U1 {
                 print()
@@ -670,34 +668,7 @@ final class BlockItemIndenterTests: XCTestCase
         try runTest(
             source: source,
             expected: expected,
-            using: BlockItemIndenter(usesXcodeStyle: false)
-        )
-    }
-
-    func test_func_newlineReturnType2_usesXcodeStyle() throws
-    {
-        let source = """
-            func foo(
-            x: Int,
-            y: Int
-            ) -> Int {
-            print()
-            }
-            """
-
-        let expected = """
-            func foo(
-                x: Int,
-                y: Int
-                ) -> Int {
-                print()
-            }
-            """
-
-        try runTest(
-            source: source,
-            expected: expected,
-            using: BlockItemIndenter(usesXcodeStyle: true)
+            using: BlockItemIndenter()
         )
     }
 
@@ -1019,32 +990,7 @@ final class BlockItemIndenterTests: XCTestCase
         try runTest(
             source: source,
             expected: expected,
-            using: BlockItemIndenter(usesXcodeStyle: false)
-        )
-    }
-
-    func test_methodChaining5_usesXcodeStyle() throws
-    {
-        let source = """
-            a.b {
-            return
-            }.c {
-            return
-            }
-            """
-
-        let expected = """
-            a.b {
-                return
-                }.c {
-                    return
-                }
-            """
-
-        try runTest(
-            source: source,
-            expected: expected,
-            using: BlockItemIndenter(usesXcodeStyle: true)
+            using: BlockItemIndenter()
         )
     }
 
@@ -1221,32 +1167,7 @@ final class BlockItemIndenterTests: XCTestCase
         try runTest(
             source: source,
             expected: expected,
-            using: BlockItemIndenter(usesXcodeStyle: false)
-        )
-    }
-
-    func test_methodChaining_arg2_usesXcodeStyle() throws
-    {
-        let source = """
-            Observable.merge(
-            o1,
-            o2
-            )
-            .subscribe()
-            """
-
-        let expected = """
-            Observable.merge(
-                o1,
-                o2
-            ␣␣␣␣)
-                .subscribe()
-            """
-
-        try runTest(
-            source: source,
-            expected: expected,
-            using: BlockItemIndenter(usesXcodeStyle: true)
+            using: BlockItemIndenter()
         )
     }
 
@@ -1366,60 +1287,7 @@ final class BlockItemIndenterTests: XCTestCase
         try runTest(
             source: source,
             expected: expected,
-            using: BlockItemIndenter(usesXcodeStyle: false)
-        )
-    }
-
-    func test_methodChaining_complex_usesXcodeStyle() throws
-    {
-        let source = """
-            api.send {
-            run {
-            $0
-            }
-            $0.run {
-            $0
-            }
-            }.foo()
-            .bar()
-            .foo {
-            print()
-            $0.run {
-            print()
-            }
-            print()
-            }
-            .hoge {
-            print()
-            }
-            """
-
-        let expected = """
-            api.send {
-                run {
-                    $0
-                }
-                $0.run {
-                    $0
-                }
-            ␣␣␣␣}.foo()
-                .bar()
-                .foo {
-                    print()
-                    $0.run {
-                        print()
-                    }
-                    print()
-                }
-                .hoge {
-                    print()
-                }
-            """
-
-        try runTest(
-            source: source,
-            expected: expected,
-            using: BlockItemIndenter(usesXcodeStyle: true)
+            using: BlockItemIndenter()
         )
     }
 

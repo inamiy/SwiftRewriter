@@ -65,9 +65,8 @@ var rewriter: Rewriter {
             perIndent: .spaces(4),
             shouldIndentSwitchCase: false,
             shouldIndentIfConfig: false,
-            skipsCommentedLine: true,
-            usesXcodeStyle: false
-            ))
+            skipsCommentedLine: true
+        ))
 
         // Space
 //        >>> ExtraSpaceTrimmer()   // may disturb manually-aligned code
