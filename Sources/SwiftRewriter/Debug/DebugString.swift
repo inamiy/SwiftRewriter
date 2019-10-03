@@ -21,7 +21,7 @@ extension Syntax
     var shortDebugString: String
     {
         let str = String(self.description.drop(while: { $0 == " " || $0 == "\n" }))
-        return "\(str) (\(type(of: self)))"
+        return "\(str) [\(type(of: self))]"
     }
 
     /// Detailed debugging string.
@@ -40,8 +40,8 @@ extension Syntax
             ("trailingTriviaLength", self.trailingTriviaLength),
             ("position", self.position),
             ("positionAfterSkippingLeadingTrivia", self.positionAfterSkippingLeadingTrivia),
-            ("endPosition", self.endPosition),
-            ("endPositionAfterTrailingTrivia", self.endPositionAfterTrailingTrivia)
+            ("endPositionAfterTrailingTrivia", self.endPositionBeforeTrailingTrivia),
+            ("endPosition", self.endPosition)
             ]
 
         let infos2 = infos

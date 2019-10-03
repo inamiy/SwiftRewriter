@@ -1,5 +1,4 @@
 import Foundation
-import Result
 import Commandant
 
 /// Fancy `Commandant.CommandProtocol` wrapper that runs throwing function instead.
@@ -12,8 +11,8 @@ protocol CommandProtocol: Commandant.CommandProtocol
 extension CommandProtocol
 {
     // Default implementation to suppress `Result`-based handling.
-    public func run(_ options: Options) -> Result<(), AnyError>
+    public func run(_ options: Options) -> Result<(), Swift.Error>
     {
-        return Result(attempt: { try run(options) })
+        return Result(catching: { try run(options) })
     }
 }

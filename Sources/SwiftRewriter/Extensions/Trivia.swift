@@ -11,7 +11,7 @@ extension Trivia: CustomStringConvertible
 
     public var description: String
     {
-        return "\(pieces)"
+        return self.pieces.reduce(into: "", { $0 += "\($1)" })
     }
 }
 
@@ -48,6 +48,21 @@ extension Trivia
     {
         // NOTE: Trim last `.spaces` before evaluation.
         return self.lazy.reversed().first(where: { !$0.isSpace })?.isNewline == true
+    }
+
+    var hasNewline: Bool
+    {
+        for piece in self where piece.isNewline {
+            return true
+        }
+        return false
+    }
+
+    var numberOfNewlines: Int
+    {
+        return self.reduce(into: 0) { acc, piece in
+            acc += piece.numberOfNewlines
+        }
     }
 }
 

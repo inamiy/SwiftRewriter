@@ -1,5 +1,4 @@
 import Foundation
-import Result
 import Curry
 import Commandant
 import SwiftSyntax
@@ -8,7 +7,7 @@ import SwiftRewriter
 /// Print current version.
 struct VersionCommand: CommandProtocol
 {
-    public typealias Options = NoOptions<AnyError>
+    public typealias Options = NoOptions<Swift.Error>
 
     let verb = "version"
     let function = "Display the current version of SwiftRewriter"

@@ -1,5 +1,4 @@
 import Foundation
-import Result
 import Curry
 import Commandant
 import SwiftSyntax
@@ -31,7 +30,7 @@ public struct PrintASTCommand: CommandProtocol
         }
 
         if options.enablesBugFix {
-            sourceFile = _Rewriter(BugFixer()).rewrite(sourceFile)
+            sourceFile = _Rewriter().rewrite(sourceFile)
         }
 
         print(DebugTree(sourceFile))
@@ -44,9 +43,9 @@ public struct PrintASTOptions: OptionsProtocol
     fileprivate let string: String?
     fileprivate let enablesBugFix: Bool
 
-    public static func evaluate(_ m: CommandMode) -> Result<PrintASTOptions, CommandantError<AnyError>>
+    public static func evaluate(_ m: CommandMode) -> Result<PrintASTOptions, CommandantError<Swift.Error>>
     {
-        return curry(self.init)
+        return curry(Self.init)
             <*> m <| pathOption(action: "print")
             <*> m <| Option(key: "string", defaultValue: nil, usage: "Swift code to parse")
             <*> m <| Option(key: "enables-bugfix",

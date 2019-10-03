@@ -11,9 +11,9 @@ class BlockItemIndenter: SyntaxRewriter, HasRewriterExamples
 
     private var _currentIndentLevel = -1
 
-    /// Current syntax-position that tried to increment indent.
+    /// Current syntax-position stack that tried to increment indent.
     /// - Note: This is used to not duplicate increment while traversing AST with same position.
-    private var _currentPosition: AbsolutePosition? = nil
+    private var _currentPosition: [AbsolutePosition] = []
 
     /// Flag stack for handling `CodeBlockItemList` indent after `#if ... #endif` (`IfConfigDecl`).
     ///
@@ -146,9 +146,9 @@ class BlockItemIndenter: SyntaxRewriter, HasRewriterExamples
         Debug.print("""
             ========================================
             [tryIndent] \(type(of: syntax)) > \(type(of: part))
+            [tryIndent] oldPosition = \(self._currentPosition)
             [tryIndent] newPosition = \(part.position)
-            [tryIndent] oldPosition = \(self._currentPosition.map(String.init(describing:)) ?? "nil")
-            [tryIndent] part.leadingTriviaLength.newlines > 0 = \(part.leadingTriviaLength.newlines > 0)
+            [tryIndent] part.leadingTrivia.hasNewline = \(part.leadingTrivia!.hasNewline)
             [tryIndent] isIncremented = \(isIncremented)
             "\(part.shortDebugString)"
             ========================================
@@ -156,15 +156,19 @@ class BlockItemIndenter: SyntaxRewriter, HasRewriterExamples
 
         // If newline detected and not already indented
         if !isIncremented
-            && (part.leadingTriviaLength.newlines > 0 || part.containsFirstToken)
-            && part.position != self._currentPosition
+            && (part.leadingTrivia!.hasNewline || part.containsFirstToken)
+            && part.position != self._currentPosition.last
         {
             isIncremented = true
 
             self._incrementIndentLevel(tag: syntax, line: line)
         }
 
-        self._currentPosition = part.position
+        self._currentPosition.append(part.position)
+
+        defer {
+            self._currentPosition.removeLast()
+        }
 
         let part2 = self.visit(part) as! Part
 
@@ -397,7 +401,7 @@ class BlockItemIndenter: SyntaxRewriter, HasRewriterExamples
 
         var syntax2: T = syntax
 
-        for i in syntax.indices {
+        for i in 0..<syntax.count {
             self._methodChainState.append(.initialized)
 
             defer {

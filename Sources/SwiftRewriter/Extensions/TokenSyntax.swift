@@ -9,7 +9,7 @@ extension TokenSyntax
         let isFirstToken = self.containsFirstToken
 
         // Run only when `isFirstToken` or multiline leading trivia.
-        guard isFirstToken || self.leadingTriviaLength.newlines > 0 else {
+        guard isFirstToken || self.leadingTrivia.hasNewline else {
             return self
         }
 
@@ -170,7 +170,7 @@ extension TokenSyntax
     /// Trim `leadingTrivia`'s first empty (space-only) lines except indent.
     func withoutLeadingTriviaFirstEmptyLines(replacingTo triviaPieces: [TriviaPiece] = []) -> TokenSyntax
     {
-        guard self.leadingTriviaLength.newlines > 0 else {
+        guard self.leadingTrivia.hasNewline else {
             return self
         }
 

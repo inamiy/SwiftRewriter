@@ -1,5 +1,4 @@
 import Foundation
-import Result
 import Curry
 import Commandant
 import Files
@@ -31,20 +30,24 @@ public struct RunCommand: CommandProtocol
         guard file.extension == "swift" else { return }
 
         let t1 = DispatchTime.now()
+
         let sourceFile: SourceFileSyntax =
             try Rewriter.parse(sourceFileURL: URL(fileURLWithPath: file.path))
+
         let t2 = DispatchTime.now()
+
         let result = rewriter.rewrite(sourceFile)
+
         let t3 = DispatchTime.now()
 
         print("Processing file: \(file.path)")
 
         if options.debug {
             print("=============== time ===============")
-            print("SyntaxTreeParser.parse time:  ", t2.uptimeNanoseconds - t1.uptimeNanoseconds)
-            print("rewriter.rewrite time:", t3.uptimeNanoseconds - t2.uptimeNanoseconds)
+            print("total time:", t3 - t1)
+            print("  SyntaxParser.parse time:  ", t2 - t1)
+            print("  rewriter.rewrite time:", t3 - t2)
             print("=============== result ===============")
-            print(result)
             print()
         }
         else {
@@ -65,9 +68,9 @@ public struct RunOptions: OptionsProtocol
     fileprivate let path: String
     fileprivate let debug: Bool
 
-    public static func evaluate(_ m: CommandMode) -> Result<RunOptions, CommandantError<AnyError>>
+    public static func evaluate(_ m: CommandMode) -> Result<RunOptions, CommandantError<Swift.Error>>
     {
-        return curry(self.init)
+        return curry(Self.init)
             <*> m <| pathOption(action: "run")
             <*> m <| Switch(flag: "d", key: "debug", usage: "DEBUG")
     }

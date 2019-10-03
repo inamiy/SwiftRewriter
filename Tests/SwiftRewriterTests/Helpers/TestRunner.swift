@@ -89,7 +89,6 @@ func runTestFile<T>(
 
 // MARK: - Parse string or file
 
-/// - Note: Including `BugFixer`.
 func parseString(_ source: String) throws -> SourceFileSyntax
 {
     let sourceURL = URL(fileURLWithPath: NSTemporaryDirectory())
@@ -98,15 +97,13 @@ func parseString(_ source: String) throws -> SourceFileSyntax
 
     try source.write(to: sourceURL, atomically: true, encoding: .utf8)
 
-    let syntax = try SyntaxTreeParser.parse(sourceURL)
+    let syntax = try SyntaxParser.parse(sourceURL)
 
-    return BugFixer().parse(syntax)
+    return syntax
 }
 
 /// Parse test file in
 /// `{CurrentTestFileDirectory}/__TestSources__/{CurrentTestFileName}/test.{filename}.swift`.
-///
-/// - Note: Including `BugFixer`.
 func parseTestFile(
     filename sourceFileName: String,
     file: StaticString,
@@ -124,14 +121,14 @@ func parseTestFile(
         .appendingPathComponent("\(function.dropLast(2)).\(sourceFileName)")
         .appendingPathExtension("swift")
 
-    let syntax = try SyntaxTreeParser.parse(testSourceFileUrl)
+    let syntax = try SyntaxParser.parse(testSourceFileUrl)
 
-    return BugFixer().parse(syntax)
+    return syntax
 }
 
 // MARK: - Private
 
-extension SyntaxRewriter
+extension SwiftRewriter.SyntaxRewriter
 {
     fileprivate func parse(_ syntax: SourceFileSyntax) -> SourceFileSyntax
     {

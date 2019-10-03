@@ -1,8 +1,8 @@
 import Foundation
-import Result
 import Commandant
+import SwiftSyntax
 
-let registry = CommandRegistry<AnyError>()
+let registry = CommandRegistry<Swift.Error>()
 
 registry.register(RunCommand())
 //registry.register(PrintASTCommand())  // ignored in version 0.1.0

@@ -16,10 +16,23 @@ all: build
 
 .PHONY: build
 build: $(SOURCES)
-	@swift build \
-		-c release \
+	swift build \
+		--configuration debug \
 		--disable-sandbox \
 		--build-path "$(BUILDDIR)"
+
+.PHONY: build-release
+build-release: $(SOURCES)
+	swift build \
+		--configuration release \
+		--disable-sandbox \
+		--build-path "$(BUILDDIR)" \
+		--verbose \
+		-Xswiftc "-enforce-exclusivity=unchecked"
+
+.PHONY: xcode
+xcode:
+	swift package generate-xcodeproj
 
 .PHONY: install
 install: build
