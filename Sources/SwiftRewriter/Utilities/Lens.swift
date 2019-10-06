@@ -1,132 +1,6 @@
 import Foundation
 import SwiftSyntax
-
-// MARK: - Lens
-
-/// Functional getter & seter.
-/// An optic used to zoom inside a product-type.
-struct Lens<Whole, Part>
-{
-    let setter: (Whole, Part) -> Whole
-    let getter: (Whole) -> Part
-
-    static func >>> <Part2>(l: Lens<Whole, Part>, r: Lens<Part, Part2>) -> Lens<Whole, Part2>
-    {
-        return Lens<Whole, Part2>(
-            setter: { a, c in l.setter(a, r.setter(l.getter(a), c)) },
-            getter: { r.getter(l.getter($0)) }
-        )
-    }
-}
-
-// MARK: - Prism
-
-/// An optic used to select part of a sum-type.
-struct Prism<Whole, Part>
-{
-    let tryGet: (Whole) -> Part?
-    let inject: (Part) -> Whole
-}
-
-func some<A>() -> Prism<A?, A>
-{
-    return Prism<A?, A>.init(tryGet: { $0 }, inject: { $0 })
-}
-
-func none<A>() -> Prism<A?, ()>
-{
-    return Prism<A?, ()>.init(
-        tryGet: {
-            switch $0 {
-            case .none: return ()
-            case .some: return .none
-            }
-        },
-        inject: { .none }
-    )
-}
-
-// MARK: - AffineTraversal
-
-/// An optic focused on zero or one target.
-///
-/// - Note: This type is equivalent to Scala Monocle's `Optional`.
-///
-/// - SeeAlso:
-///   - https://broomburgo.github.io/fun-ios/post/lenses-and-prisms-in-swift-a-pragmatic-approach/
-///   - http://oleg.fi/gists/posts/2017-03-20-affine-traversal.html
-///   - https://julien-truffaut.github.io/Monocle/optics/optional.html
-struct AffineTraversal<Whole, Part>
-{
-    let tryGet: (Whole) -> Part?
-    let setter: (Whole, Part) -> Whole
-
-    init(tryGet: @escaping (Whole) -> Part?, setter: @escaping (Whole, Part) -> Whole)
-    {
-        self.tryGet = tryGet
-        self.setter = setter
-    }
-
-    init(lens: Lens<Whole, Part>)
-    {
-        self.init(tryGet: lens.getter, setter: lens.setter)
-    }
-
-    init(prism: Prism<Whole, Part>)
-    {
-        self.init(tryGet: prism.tryGet, setter: { prism.inject($1) })
-    }
-}
-
-extension AffineTraversal
-{
-    static func >>> <Part2>(l: AffineTraversal<Whole, Part>, r: AffineTraversal<Part, Part2>) -> AffineTraversal<Whole, Part2>
-    {
-        return AffineTraversal<Whole, Part2>(
-            tryGet: { whole -> Part2? in
-                l.tryGet(whole).flatMap { r.tryGet($0) }
-            },
-            setter: { whole, part2 -> Whole in
-                if let part = l.tryGet(whole) {
-                    return l.setter(whole, r.setter(part, part2))
-                }
-                else {
-                    return whole
-                }
-            }
-        )
-    }
-}
-
-func >>> <Whole, Part, Part2>(l: Lens<Whole, Part>, r: Prism<Part, Part2>) -> AffineTraversal<Whole, Part2>
-{
-    return .init(lens: l) >>> .init(prism: r)
-}
-
-func >>> <Whole, Part, Part2>(l: Prism<Whole, Part>, r: Lens<Part, Part2>) -> AffineTraversal<Whole, Part2>
-{
-    return .init(prism: l) >>> .init(lens: r)
-}
-
-func >>> <Whole, Part, Part2>(l: Lens<Whole, Part>, r: AffineTraversal<Part, Part2>) -> AffineTraversal<Whole, Part2>
-{
-    return .init(lens: l) >>> r
-}
-
-func >>> <Whole, Part, Part2>(l: AffineTraversal<Whole, Part>, r: Lens<Part, Part2>) -> AffineTraversal<Whole, Part2>
-{
-    return l >>> .init(lens: r)
-}
-
-func >>> <Whole, Part, Part2>(l: Prism<Whole, Part>, r: AffineTraversal<Part, Part2>) -> AffineTraversal<Whole, Part2>
-{
-    return .init(prism: l) >>> r
-}
-
-func >>> <Whole, Part, Part2>(l: AffineTraversal<Whole, Part>, r: Prism<Part, Part2>) -> AffineTraversal<Whole, Part2>
-{
-    return l >>> .init(prism: r)
-}
+import FunOptics
 
 // MARK: - StructDeclSyntax
 
@@ -134,8 +8,8 @@ extension Lens where Whole == StructDeclSyntax, Part == AttributeListSyntax?
 {
     /// Cursor 0
     static let attributes = Lens(
-        setter: { $0.withAttributes($1) },
-        getter: { $0.attributes }
+        get: { $0.attributes },
+        set: { $0.withAttributes($1) }
     )
 }
 
@@ -143,8 +17,8 @@ extension Lens where Whole == StructDeclSyntax, Part == ModifierListSyntax?
 {
     /// Cursor 1
     static let modifiers = Lens(
-        setter: { $0.withModifiers($1) },
-        getter: { $0.modifiers }
+        get: { $0.modifiers },
+        set: { $0.withModifiers($1) }
     )
 }
 
@@ -152,14 +26,14 @@ extension Lens where Whole == StructDeclSyntax, Part == TokenSyntax
 {
     /// Cursor 2
     static let structKeyword = Lens(
-        setter: { $0.withStructKeyword($1) },
-        getter: { $0.structKeyword }
+        get: { $0.structKeyword },
+        set: { $0.withStructKeyword($1) }
     )
 
     /// Cursor 3
     static let identifier = Lens(
-        setter: { $0.withIdentifier($1) },
-        getter: { $0.identifier }
+        get: { $0.identifier },
+        set: { $0.withIdentifier($1) }
     )
 }
 
@@ -167,8 +41,8 @@ extension Lens where Whole == StructDeclSyntax, Part == GenericParameterClauseSy
 {
     /// Cursor 4
     static let genericParameterClause = Lens(
-        setter: { $0.withGenericParameterClause($1) },
-        getter: { $0.genericParameterClause }
+        get: { $0.genericParameterClause },
+        set: { $0.withGenericParameterClause($1) }
     )
 }
 
@@ -176,8 +50,8 @@ extension Lens where Whole == StructDeclSyntax, Part == TypeInheritanceClauseSyn
 {
     /// Cursor 5
     static let inheritanceClause = Lens(
-        setter: { $0.withInheritanceClause($1) },
-        getter: { $0.inheritanceClause }
+        get: { $0.inheritanceClause },
+        set: { $0.withInheritanceClause($1) }
     )
 }
 
@@ -185,8 +59,8 @@ extension Lens where Whole == StructDeclSyntax, Part == GenericWhereClauseSyntax
 {
     /// Cursor 6
     static let genericWhereClause = Lens(
-        setter: { $0.withGenericWhereClause($1) },
-        getter: { $0.genericWhereClause }
+        get: { $0.genericWhereClause },
+        set: { $0.withGenericWhereClause($1) }
     )
 }
 
@@ -194,8 +68,8 @@ extension Lens where Whole == StructDeclSyntax, Part == MemberDeclBlockSyntax
 {
     /// Cursor 7
     static let body = Lens(
-        setter: { $0.withMembers($1) },
-        getter: { $0.members }
+        get: { $0.members },
+        set: { $0.withMembers($1) }
     )
 }
 
@@ -205,8 +79,8 @@ extension Lens where Whole == InitializerDeclSyntax, Part == AttributeListSyntax
 {
     /// Cursor 0
     static let attributes = Lens(
-        setter: { $0.withAttributes($1) },
-        getter: { $0.attributes }
+        get: { $0.attributes },
+        set: { $0.withAttributes($1) }
     )
 }
 
@@ -214,8 +88,8 @@ extension Lens where Whole == InitializerDeclSyntax, Part == ModifierListSyntax?
 {
     /// Cursor 1
     static let modifiers = Lens(
-        setter: { $0.withModifiers($1) },
-        getter: { $0.modifiers }
+        get: { $0.modifiers },
+        set: { $0.withModifiers($1) }
     )
 }
 
@@ -223,8 +97,8 @@ extension Lens where Whole == InitializerDeclSyntax, Part == TokenSyntax
 {
     /// Cursor 2
     static let initKeyword = Lens(
-        setter: { $0.withInitKeyword($1) },
-        getter: { $0.initKeyword }
+        get: { $0.initKeyword },
+        set: { $0.withInitKeyword($1) }
     )
 }
 
@@ -232,14 +106,14 @@ extension Lens where Whole == InitializerDeclSyntax, Part == TokenSyntax?
 {
     /// Cursor 3
     static let optionalMark = Lens(
-        setter: { $0.withOptionalMark($1) },
-        getter: { $0.optionalMark }
+        get: { $0.optionalMark },
+        set: { $0.withOptionalMark($1) }
     )
 
     /// Cursor 6
     static let throwsOrRethrowsKeyword = Lens(
-        setter: { $0.withThrowsOrRethrowsKeyword($1) },
-        getter: { $0.throwsOrRethrowsKeyword }
+        get: { $0.throwsOrRethrowsKeyword },
+        set: { $0.withThrowsOrRethrowsKeyword($1) }
     )
 }
 
@@ -247,8 +121,8 @@ extension Lens where Whole == InitializerDeclSyntax, Part == GenericParameterCla
 {
     /// Cursor 4
     static let genericParameterClause = Lens(
-        setter: { $0.withGenericParameterClause($1) },
-        getter: { $0.genericParameterClause }
+        get: { $0.genericParameterClause },
+        set: { $0.withGenericParameterClause($1) }
     )
 }
 
@@ -256,8 +130,8 @@ extension Lens where Whole == InitializerDeclSyntax, Part == ParameterClauseSynt
 {
     /// Cursor 5
     static let parameters = Lens(
-        setter: { $0.withParameters($1) },
-        getter: { $0.parameters }
+        get: { $0.parameters },
+        set: { $0.withParameters($1) }
     )
 }
 
@@ -265,8 +139,8 @@ extension Lens where Whole == InitializerDeclSyntax, Part == GenericWhereClauseS
 {
     /// Cursor 7
     static let genericWhereClause = Lens(
-        setter: { $0.withGenericWhereClause($1) },
-        getter: { $0.genericWhereClause }
+        get: { $0.genericWhereClause },
+        set: { $0.withGenericWhereClause($1) }
     )
 }
 
@@ -274,8 +148,8 @@ extension Lens where Whole == InitializerDeclSyntax, Part == CodeBlockSyntax?
 {
     /// Cursor 8
     static let body = Lens(
-        setter: { $0.withBody($1) },
-        getter: { $0.body }
+        get: { $0.body },
+        set: { $0.withBody($1) }
     )
 }
 
@@ -285,8 +159,8 @@ extension Lens where Whole == FunctionDeclSyntax, Part == AttributeListSyntax?
 {
     /// Cursor 0
     static let attributes = Lens(
-        setter: { $0.withAttributes($1) },
-        getter: { $0.attributes }
+        get: { $0.attributes },
+        set: { $0.withAttributes($1) }
     )
 }
 
@@ -294,8 +168,8 @@ extension Lens where Whole == FunctionDeclSyntax, Part == ModifierListSyntax?
 {
     /// Cursor 1
     static let modifiers = Lens(
-        setter: { $0.withModifiers($1) },
-        getter: { $0.modifiers }
+        get: { $0.modifiers },
+        set: { $0.withModifiers($1) }
     )
 }
 
@@ -303,14 +177,14 @@ extension Lens where Whole == FunctionDeclSyntax, Part == TokenSyntax
 {
     /// Cursor 2
     static let funcKeyword = Lens(
-        setter: { $0.withFuncKeyword($1) },
-        getter: { $0.funcKeyword }
+        get: { $0.funcKeyword },
+        set: { $0.withFuncKeyword($1) }
     )
 
     /// Cursor 3
     static let identifier = Lens(
-        setter: { $0.withIdentifier($1) },
-        getter: { $0.identifier }
+        get: { $0.identifier },
+        set: { $0.withIdentifier($1) }
     )
 }
 
@@ -318,8 +192,8 @@ extension Lens where Whole == FunctionDeclSyntax, Part == GenericParameterClause
 {
     /// Cursor 4
     static let genericParameterClause = Lens(
-        setter: { $0.withGenericParameterClause($1) },
-        getter: { $0.genericParameterClause }
+        get: { $0.genericParameterClause },
+        set: { $0.withGenericParameterClause($1) }
     )
 }
 
@@ -327,8 +201,8 @@ extension Lens where Whole == FunctionDeclSyntax, Part == FunctionSignatureSynta
 {
     /// Cursor 5
     static let signature = Lens(
-        setter: { $0.withSignature($1) },
-        getter: { $0.signature }
+        get: { $0.signature },
+        set: { $0.withSignature($1) }
     )
 }
 
@@ -336,8 +210,8 @@ extension Lens where Whole == FunctionDeclSyntax, Part == GenericWhereClauseSynt
 {
     /// Cursor 6
     static let genericWhereClause = Lens(
-        setter: { $0.withGenericWhereClause($1) },
-        getter: { $0.genericWhereClause }
+        get: { $0.genericWhereClause },
+        set: { $0.withGenericWhereClause($1) }
     )
 }
 
@@ -345,8 +219,8 @@ extension Lens where Whole == FunctionDeclSyntax, Part == CodeBlockSyntax?
 {
     /// Cursor 7
     static let body = Lens(
-        setter: { $0.withBody($1) },
-        getter: { $0.body }
+        get: { $0.body },
+        set: { $0.withBody($1) }
     )
 }
 
@@ -356,8 +230,8 @@ extension Lens where Whole == FunctionSignatureSyntax, Part == ParameterClauseSy
 {
     /// Cursor 0
     static let input = Lens(
-        setter: { $0.withInput($1) },
-        getter: { $0.input }
+        get: { $0.input },
+        set: { $0.withInput($1) }
     )
 }
 
@@ -365,8 +239,8 @@ extension Lens where Whole == FunctionSignatureSyntax, Part == TokenSyntax?
 {
     /// Cursor 1
     static let throwsOrRethrowsKeyword = Lens(
-        setter: { $0.withThrowsOrRethrowsKeyword($1) },
-        getter: { $0.throwsOrRethrowsKeyword }
+        get: { $0.throwsOrRethrowsKeyword },
+        set: { $0.withThrowsOrRethrowsKeyword($1) }
     )
 }
 
@@ -374,8 +248,8 @@ extension Lens where Whole == FunctionSignatureSyntax, Part == ReturnClauseSynta
 {
     /// Cursor 2
     static let output = Lens(
-        setter: { $0.withOutput($1) },
-        getter: { $0.output }
+        get: { $0.output },
+        set: { $0.withOutput($1) }
     )
 }
 
@@ -385,14 +259,14 @@ extension Lens where Whole == ParameterClauseSyntax, Part == TokenSyntax
 {
     /// Cursor 0
     static let leftParen = Lens(
-        setter: { $0.withLeftParen($1) },
-        getter: { $0.leftParen }
+        get: { $0.leftParen },
+        set: { $0.withLeftParen($1) }
     )
 
     /// Cursor 2
     static let rightParen = Lens(
-        setter: { $0.withRightParen($1) },
-        getter: { $0.rightParen }
+        get: { $0.rightParen },
+        set: { $0.withRightParen($1) }
     )
 }
 
@@ -400,8 +274,8 @@ extension Lens where Whole == ParameterClauseSyntax, Part == FunctionParameterLi
 {
     /// Cursor 1
     static let parameterList = Lens(
-        setter: { $0.withParameterList($1) },
-        getter: { $0.parameterList }
+        get: { $0.parameterList },
+        set: { $0.withParameterList($1) }
     )
 }
 
@@ -411,8 +285,8 @@ extension Lens where Whole == InitializerClauseSyntax, Part == TokenSyntax
 {
     /// Cursor 0
     static let equal = Lens(
-        setter: { $0.withEqual($1) },
-        getter: { $0.equal }
+        get: { $0.equal },
+        set: { $0.withEqual($1) }
     )
 }
 
@@ -420,8 +294,8 @@ extension Lens where Whole == InitializerClauseSyntax, Part == ExprSyntax
 {
     /// Cursor 1
     static let value = Lens(
-        setter: { $0.withValue($1) },
-        getter: { $0.value }
+        get: { $0.value },
+        set: { $0.withValue($1) }
     )
 }
 
@@ -431,8 +305,8 @@ extension Lens where Whole == WhereClauseSyntax, Part == TokenSyntax
 {
     /// Cursor 0
     static let whereKeyword = Lens(
-        setter: { $0.withWhereKeyword($1) },
-        getter: { $0.whereKeyword }
+        get: { $0.whereKeyword },
+        set: { $0.withWhereKeyword($1) }
     )
 }
 
@@ -440,8 +314,8 @@ extension Lens where Whole == WhereClauseSyntax, Part == ExprSyntax
 {
     /// Cursor 1
     static let guardResult = Lens(
-        setter: { $0.withGuardResult($1) },
-        getter: { $0.guardResult }
+        get: { $0.guardResult },
+        set: { $0.withGuardResult($1) }
     )
 }
 
@@ -451,8 +325,8 @@ extension Lens where Whole == ReturnClauseSyntax, Part == TokenSyntax
 {
     /// Cursor 0
     static let arrow = Lens(
-        setter: { $0.withArrow($1) },
-        getter: { $0.arrow }
+        get: { $0.arrow },
+        set: { $0.withArrow($1) }
     )
 }
 
@@ -460,8 +334,8 @@ extension Lens where Whole == ReturnClauseSyntax, Part == TypeSyntax
 {
     /// Cursor 1
     static let returnType = Lens(
-        setter: { $0.withReturnType($1) },
-        getter: { $0.returnType }
+        get: { $0.returnType },
+        set: { $0.withReturnType($1) }
     )
 }
 
@@ -470,16 +344,16 @@ extension Lens where Whole == ReturnClauseSyntax, Part == TypeSyntax
 extension Lens where Whole == GenericWhereClauseSyntax, Part == TokenSyntax
 {
     static let whereKeyword = Lens(
-        setter: { $0.withWhereKeyword($1) },
-        getter: { $0.whereKeyword }
+        get: { $0.whereKeyword },
+        set: { $0.withWhereKeyword($1) }
     )
 }
 
 extension Lens where Whole == GenericWhereClauseSyntax, Part == GenericRequirementListSyntax
 {
     static let requirementList = Lens(
-        setter: { $0.withRequirementList($1) },
-        getter: { $0.requirementList }
+        get: { $0.requirementList },
+        set: { $0.withRequirementList($1) }
     )
 }
 
@@ -488,16 +362,16 @@ extension Lens where Whole == GenericWhereClauseSyntax, Part == GenericRequireme
 extension Lens where Whole == GuardStmtSyntax, Part == TokenSyntax
 {
     static let elseKeyword = Lens(
-        setter: { $0.withElseKeyword($1) },
-        getter: { $0.elseKeyword }
+        get: { $0.elseKeyword },
+        set: { $0.withElseKeyword($1) }
     )
 }
 
 extension Lens where Whole == GuardStmtSyntax, Part == CodeBlockSyntax
 {
     static let body = Lens(
-        setter: { $0.withBody($1) },
-        getter: { $0.body }
+        get: { $0.body },
+        set: { $0.withBody($1) }
     )
 }
 
@@ -507,20 +381,20 @@ extension Lens where Whole == TernaryExprSyntax, Part == ExprSyntax
 {
     /// Cursor 0
     static let conditionExpression = Lens(
-        setter: { $0.withConditionExpression($1) },
-        getter: { $0.conditionExpression }
+        get: { $0.conditionExpression },
+        set: { $0.withConditionExpression($1) }
     )
 
     /// Cursor 2
     static let firstChoice = Lens(
-        setter: { $0.withFirstChoice($1) },
-        getter: { $0.firstChoice }
+        get: { $0.firstChoice },
+        set: { $0.withFirstChoice($1) }
     )
 
     /// Cursor 4
     static let secondChoice = Lens(
-        setter: { $0.withSecondChoice($1) },
-        getter: { $0.secondChoice }
+        get: { $0.secondChoice },
+        set: { $0.withSecondChoice($1) }
     )
 }
 
@@ -528,14 +402,14 @@ extension Lens where Whole == TernaryExprSyntax, Part == TokenSyntax
 {
     /// Cursor 1
     static let questionMark = Lens(
-        setter: { $0.withQuestionMark($1) },
-        getter: { $0.questionMark }
+        get: { $0.questionMark },
+        set: { $0.withQuestionMark($1) }
     )
 
     /// Cursor 3
     static let colonMark = Lens(
-        setter: { $0.withColonMark($1) },
-        getter: { $0.colonMark }
+        get: { $0.colonMark },
+        set: { $0.withColonMark($1) }
     )
 }
 
@@ -545,8 +419,8 @@ extension Lens where Whole == FunctionCallExprSyntax, Part == ExprSyntax
 {
     /// Cursor 0
     static let calledExpression = Lens(
-        setter: { $0.withCalledExpression($1) },
-        getter: { $0.calledExpression }
+        get: { $0.calledExpression },
+        set: { $0.withCalledExpression($1) }
     )
 }
 
@@ -554,8 +428,8 @@ extension Lens where Whole == FunctionCallExprSyntax, Part == FunctionCallArgume
 {
     /// Cursor 2
     static let argumentList = Lens(
-        setter: { $0.withArgumentList($1) },
-        getter: { $0.argumentList }
+        get: { $0.argumentList },
+        set: { $0.withArgumentList($1) }
     )
 }
 
@@ -563,8 +437,8 @@ extension Lens where Whole == FunctionCallExprSyntax, Part == ClosureExprSyntax?
 {
     /// Cursor 4
     static let trailingClosure = Lens(
-        setter: { $0.withTrailingClosure($1) },
-        getter: { $0.trailingClosure }
+        get: { $0.trailingClosure },
+        set: { $0.withTrailingClosure($1) }
     )
 }
 
@@ -572,14 +446,14 @@ extension Lens where Whole == FunctionCallExprSyntax, Part == TokenSyntax?
 {
     /// Cursor 1
     static let leftParen = Lens(
-        setter: { $0.withLeftParen($1) },
-        getter: { $0.leftParen }
+        get: { $0.leftParen },
+        set: { $0.withLeftParen($1) }
     )
 
     /// Cursor 3
     static let rightParen = Lens(
-        setter: { $0.withRightParen($1) },
-        getter: { $0.rightParen }
+        get: { $0.rightParen },
+        set: { $0.withRightParen($1) }
     )
 }
 
@@ -589,8 +463,8 @@ extension Lens where Whole == MemberAccessExprSyntax, Part == ExprSyntax?
 {
     /// Cursor 0
     static let base = Lens(
-        setter: { $0.withBase($1) },
-        getter: { $0.base }
+        get: { $0.base },
+        set: { $0.withBase($1) }
     )
 }
 
@@ -598,14 +472,14 @@ extension Lens where Whole == MemberAccessExprSyntax, Part == TokenSyntax
 {
     /// Cursor 1
     static let dot = Lens(
-        setter: { $0.withDot($1) },
-        getter: { $0.dot }
+        get: { $0.dot },
+        set: { $0.withDot($1) }
     )
 
     /// Cursor 2
     static let name = Lens(
-        setter: { $0.withName($1) },
-        getter: { $0.name }
+        get: { $0.name },
+        set: { $0.withName($1) }
     )
 }
 
@@ -613,8 +487,8 @@ extension Lens where Whole == MemberAccessExprSyntax, Part == DeclNameArgumentsS
 {
     /// Cursor 3
     static let declNameArguments = Lens(
-        setter: { $0.withDeclNameArguments($1) },
-        getter: { $0.declNameArguments }
+        get: { $0.declNameArguments },
+        set: { $0.withDeclNameArguments($1) }
     )
 }
 
@@ -624,14 +498,14 @@ extension Lens where Whole == ClosureExprSyntax, Part == TokenSyntax
 {
     /// Cursor 0
     static let leftBrace = Lens(
-        setter: { $0.withLeftBrace($1) },
-        getter: { $0.leftBrace }
+        get: { $0.leftBrace },
+        set: { $0.withLeftBrace($1) }
     )
 
     /// Cursor 3
     static let rightBrace = Lens(
-        setter: { $0.withRightBrace($1) },
-        getter: { $0.rightBrace }
+        get: { $0.rightBrace },
+        set: { $0.withRightBrace($1) }
     )
 }
 
@@ -639,8 +513,8 @@ extension Lens where Whole == ClosureExprSyntax, Part == ClosureSignatureSyntax?
 {
     /// Cursor 1
     static let signature = Lens(
-        setter: { $0.withSignature($1) },
-        getter: { $0.signature }
+        get: { $0.signature },
+        set: { $0.withSignature($1) }
     )
 }
 
@@ -648,8 +522,8 @@ extension Lens where Whole == ClosureExprSyntax, Part == CodeBlockItemListSyntax
 {
     /// Cursor 2
     static let statements = Lens(
-        setter: { $0.withStatements($1) },
-        getter: { $0.statements }
+        get: { $0.statements },
+        set: { $0.withStatements($1) }
     )
 }
 
@@ -660,8 +534,8 @@ extension Lens where Whole: SyntaxCollection, Part == Whole.Element
     static func child(at index: Int) -> Lens
     {
         return Lens(
-            setter: { $0.replacing(childAt: index, with: $1) },
-            getter: { $0.child(at: index) as! Part }
+            get: { $0.child(at: index) as! Part },
+            set: { $0.replacing(childAt: index, with: $1) }
         )
     }
 }
@@ -671,13 +545,13 @@ extension Lens where Whole: SyntaxCollection, Part == Whole.Element
 extension Lens where Whole == TokenSyntax, Part == [TriviaPiece]
 {
     static let leadingTrivia = Lens(
-        setter: { $0.withLeadingTrivia(.init(pieces: $1)) },
-        getter: { $0.leadingTrivia.pieces }
+        get: { $0.leadingTrivia.pieces },
+        set: { $0.withLeadingTrivia(.init(pieces: $1)) }
     )
 
     static let trailingTrivia = Lens(
-        setter: { $0.withTrailingTrivia(.init(pieces: $1)) },
-        getter: { $0.trailingTrivia.pieces }
+        get: { $0.trailingTrivia.pieces },
+        set: { $0.withTrailingTrivia(.init(pieces: $1)) }
     )
 }
 
@@ -688,7 +562,7 @@ extension Lens where Whole == TokenSyntax, Part == [TriviaPiece]
 func cast<Whole, Part, Part2>(_ lens: Lens<Whole, Part>) -> Lens<Whole, Part2>
 {
     return Lens<Whole, Part2>(
-        setter: { lens.setter($0, $1 as! Part) },
-        getter: { lens.getter($0) as! Part2 }
+        get: { lens.get($0) as! Part2 },
+        set: { lens.set($0, $1 as! Part) }
     )
 }
