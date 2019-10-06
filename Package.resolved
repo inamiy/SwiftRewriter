@@ -47,6 +47,15 @@
         }
       },
       {
+        "package": "FunOptics",
+        "repositoryURL": "https://github.com/inamiy/FunOptics",
+        "state": {
+          "branch": null,
+          "revision": "02022bcd4b6e77b03f34af672c3815d65ffd23d7",
+          "version": "1.0.0"
+        }
+      },
+      {
         "package": "Nimble",
         "repositoryURL": "https://github.com/Quick/Nimble.git",
         "state": {

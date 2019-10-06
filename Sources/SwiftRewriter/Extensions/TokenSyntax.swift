@@ -1,4 +1,5 @@
 import SwiftSyntax
+import FunOptics
 
 extension TokenSyntax
 {
@@ -127,7 +128,7 @@ extension TokenSyntax
         replacingLastSpaces lastPieces: [TriviaPiece]
         ) -> TokenSyntax
     {
-        var pieces = lens.getter(self)
+        var pieces = lens.get(self)
 
         if !pieces.isEmpty {
             if let lastIndex = pieces.lastIndex(where: { !$0.isSpace }) {
@@ -142,7 +143,7 @@ extension TokenSyntax
         pieces.append(contentsOf: lastPieces)
 
         var token2 = self
-        token2 = lens.setter(self, pieces)
+        token2 = lens.set(self, pieces)
         return token2
     }
 
@@ -152,7 +153,7 @@ extension TokenSyntax
         replacingFirstSpaces firstPieces: [TriviaPiece]
         ) -> TokenSyntax
     {
-        var pieces = lens.getter(self)
+        var pieces = lens.get(self)
 
         if !pieces.isEmpty {
             let firstIndex = pieces.firstIndex(where: { !$0.isSpace }) ?? pieces.endIndex
@@ -163,7 +164,7 @@ extension TokenSyntax
         pieces.insert(contentsOf: firstPieces, at: 0)
 
         var token2 = self
-        token2 = lens.setter(self, pieces)
+        token2 = lens.set(self, pieces)
         return token2
     }
 

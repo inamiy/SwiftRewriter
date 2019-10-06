@@ -1,4 +1,5 @@
 import SwiftSyntax
+import FunOptics
 
 /// Adjust indents for every code-block.
 class BlockItemIndenter: SyntaxRewriter, HasRewriterExamples
@@ -91,7 +92,7 @@ class BlockItemIndenter: SyntaxRewriter, HasRewriterExamples
 
         let part2 = self.visit(part) as! Part
 
-        syntax = affineTraversal.setter(syntax, part2)
+        syntax = affineTraversal.set(syntax, part2)
     }
 
     /// Increment indent level if `isIncremented == false` and `syntax` starts from newline.
@@ -163,7 +164,7 @@ class BlockItemIndenter: SyntaxRewriter, HasRewriterExamples
 
         let part2 = self.visit(part) as! Part
 
-        syntax = affineTraversal.setter(syntax, part2)
+        syntax = affineTraversal.set(syntax, part2)
     }
 
     /// - Important: Do not use this method directly. Use `_incrementIndentLevelIfNeeded` instead.
